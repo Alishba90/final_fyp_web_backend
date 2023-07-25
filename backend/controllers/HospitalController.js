@@ -5,6 +5,7 @@ const bcrypt = require('bcrypt');
 const Note= require('../models/NoteModel');
 const Order=require('../models/OrderModel');
 const Transaction=require('../models/TransactionModel');
+const Form=require('../models/NCRformsModel');
 
 // Hospital Schema
 function HospitalData(data) {
@@ -392,7 +393,7 @@ exports.AddDepartment=[
 	 (req, res) => {
     console.log('this is recieve',req.body)
     try{
-        HospitalDepartment.findOne({org_name:req.body.org_name,org_address:req.body.org_address,name:req.body.depinfo.name}).then((dept) => {
+        NCR.findOne({}).then((dept) => {
         if(dept){
             console.log("A department already exist with this name");
             return res.status(430).send({ error: "A department already exist with this name." });
@@ -539,5 +540,97 @@ exports.departmentDoctors=[
         catch(err){
             console.log(err)
         }
+    }
+]
+
+//function to retrieve all NCR forms
+exports.GetNCRforms=[
+  async (req, res) => {
+    console.log('this is received', req.body);
+
+    try {
+        Form.find({org_name:req.params.org_name,org_address:req.params.org_address}).then(f=>{
+            if(f.length){
+                var forms=f;
+                return res.status(200).send({forms:forms})
+            }
+            else{
+                return res.status(430).send({ error:"No such forms found"});
+            }
+        }
+        )
+      } 
+    catch (err) {
+      console.log(err);
+      return res.status(430).send({ error: err });
+    }
+  }
+]
+
+//function to store NCR forms
+exports.saveNCRforms=[
+	 (req, res) => {
+    console.log('this is recieve',req.body)
+    try{
+        Form.findOne({org_name:req.body.org_name,org_address:req.body.org_address,form_no:req.body.form_no}).then((f) => {
+        if(f){
+            console.log("A form already exist with this number");
+            return res.status(430).send({ error: "A form already exist with this number." });
+        }else{
+            let form=new Form({
+                org_name:req.body.org_name,
+                org_address:req.body.org_address,
+                form_type:req.body.depinfo.form_type,
+                form_date:req.body.depinfo.form_date,
+                form_no:req.body.depinfo.phone,   
+                form_title:req.body.depinfo.form_title,
+                entree_name:req.body.depinfo.entree_name,
+                resolution_description:req.body.depinfo.resolution_description,
+                resolver_name:req.body.depinfo.resolver_name,
+                resolution_date:req.body.depinfo.resolution_date
+
+        })
+            try{
+            form.save();
+            console.log("Form created successfully")
+            return res.status(200).send({ message: "Form created successfully" });}
+            catch(e){
+                console.log("Problem creating Form",e)
+            }
+        }
+    })
+    }
+    catch(err){
+        console.log(err);
+        return res.status(430).send({ error: err});
+    }
+    }
+]
+
+//function to update NCR forms for resolution
+exports.resolveNCRforms=[
+	 (req, res) => {
+    console.log('this is recieve',req.body)
+    try{
+        Form.findOne({org_name:req.body.org_name,org_address:req.body.org_address,form_no:req.body.form_no}).then((f) => {
+        if(f){
+            f.resolution_date=req.body.resolution_date
+            f.resolver_name=req.body.resolver_name
+            f.resolution_description=req.body.resolution_description
+            f.save();
+            console.log("Form updated successfully")
+            return res.status(200).send({ message: "Form updated successfully" })
+
+        }else{
+            console.log("No form exist with this number");
+            return res.status(430).send({ error: "No form exist with this number." });
+
+        }
+    })
+    }
+    catch(err){
+        console.log(err);
+        return res.status(430).send({ error: err});
+    }
     }
 ]

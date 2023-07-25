@@ -22,4 +22,8 @@ router.post("/adddep", HospitalController.AddDepartment);
 router.post("/updatedep", HospitalController.updateDepartment);
 router.delete("/deldep/:org_name/:org_address/:name", HospitalController.deleteDepartment);
 
+router.get("/getforms/:org_name/:org_address", HospitalController.GetNCRforms);
+router.post("/storeforms", HospitalController.saveNCRforms);
+router.post("/resolveform", HospitalController.resolveNCRforms);
+
 module.exports = router;
