@@ -97,13 +97,12 @@ exports.UpdatePharmacy = [
     try{
         var pharmacy=new Pharmacy(
             {
-                pharmacyname:req.body.name,
-                address:req.body.address,
-                email:req.body.email,
-                password :req.body.password,
-                phone:req.body.phone,
-                city:req.body.city,
-                time:settime(req.body.time.open,req.body.time.close)
+                pharmacyname:req.body.pharmacyinfo.pharmacyname,
+                address:req.body.pharmacyinfo.address,
+                email:req.body.pharmacyinfo.email,
+                password :req.body.pharmacyinfo.password,
+                phone:req.body.pharmacyinfo.phone,
+                time:settime(req.body.pharmacyinfo.time.open,req.body.pharmacyinfo.time.close)
     
                 }    
             )
@@ -112,19 +111,23 @@ exports.UpdatePharmacy = [
 				pharmacy
 				).then(()=>{
                 
-                if(req.body.name!=req.body.old_name&&req.body.address!=req.body.old_address){
+                if(req.body.pharmacyinfo.name!=req.body.old_name||req.body.pharmacyinfo.address!=req.body.old_address){
                     Note.update({org_name:req.body.old_name,org_address:req.body.old_address},
-                    {org_name:req.body.name,org_address:req.body.address})
+                    {org_name:req.body.pharmacyinfo.pharmacyname,org_address:req.body.pharmacyinfo.address})
 
                     Order.update({org_name:req.body.old_name,org_address:req.body.old_address},
-                    {org_name:req.body.name,org_address:req.body.address})
+                    {org_name:req.body.pharmacyinfo.pharmacyname,org_address:req.body.pharmacyinfo.address})
 
                     Transaction.update({org_name:req.body.old_name,org_address:req.body.old_address},
-                    {org_name:req.body.name,org_address:req.body.address})
+                    {org_name:req.body.pharmacyinfo.pharmacyname,org_address:req.body.pharmacyinfo.address})
 
 
                 }
-                    return res.status(200).send({message:"Pharmacy updated successfully"});
+                    console.log('i am here')
+                    var p=Pharmacy.find({Name:req.body.pharmacyinfo.name,Email:req.body.pharmacyinfo.email})
+
+                    console.log('the pharmacy updated and send',p)
+                    return res.status(200).send({pharmacy:p});
                 }    
             )
     }

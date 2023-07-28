@@ -87,13 +87,12 @@ exports.UpdateBloodBank = [
     console.log('this is recieve',req.body)
     try{
         var blood=new Blood({
-            name:req.body.name,
-            address:req.body.address,
-            email:req.body.email,
-            password :req.body.password,
-            phone:req.body.phone,
-            city:req.body.city,
-            time:settime(req.body.time.open,req.body.time.close)
+            name:req.body.bloodbankinfo.name,
+            address:req.body.bloodbankinfo.address,
+            email:req.body.bloodbankinfo.email,
+            password :req.body.bloodbankinfo.password,
+            phone:req.body.bloodbankinfo.phone,
+            time:(req.body.bloodbankinfo.time.open===''||req.body.bloodbankinfo.time.close==='')?'24/7':settime(req.body.bloodbankinfo.time.open,req.body.bloodbankinfo.time.close)
 
         })
         Blood.findOneAndUpdate(
@@ -102,19 +101,23 @@ exports.UpdateBloodBank = [
 				).then(()=>{
                 
                 
-                if(req.body.name!=req.body.old_name&&req.body.address!=req.body.old_address){
+                if(req.body.bloodbankinfo.name!=req.body.old_name||req.body.bloodbankinfo.address!=req.body.old_address){
                     Note.update({org_name:req.body.old_name,org_address:req.body.old_address},
-                    {org_name:req.body.name,org_address:req.body.address})
+                    {org_name:req.body.bloodbankinfo.name,org_address:req.body.bloodbankinfo.address})
 
                     Order.update({org_name:req.body.old_name,org_address:req.body.old_address},
-                    {org_name:req.body.name,org_address:req.body.address})
+                    {org_name:req.body.bloodbankinfo.name,org_address:req.body.bloodbankinfo.address})
 
                     Transaction.update({org_name:req.body.old_name,org_address:req.body.old_address},
-                    {org_name:req.body.name,org_address:req.body.address})
+                    {org_name:req.body.bloodbankinfo.name,org_address:req.body.bloodbankinfo.address})
 
 
                 }
-                    return res.status(200).send({message:"Blood Bank added successfully"});
+                    console.log('i am here')
+                    var b=Blood.find({Name:req.body.bloodbankinfo.name,Email:req.body.bloodbankinfo.email})
+
+                    console.log('the bloodbank updated and send',b)
+                    return res.status(200).send({bloodbank:b});
                 }    
             )
     }

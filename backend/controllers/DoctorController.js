@@ -17,7 +17,6 @@ function DoctorData(data) {
     this.Hospitals=data.Hospitals;
 }
 
-
 //To get Doctor details
 exports.DoctorDetail = [
 
@@ -83,20 +82,27 @@ exports.UpdateDoctor = [
     console.log('this is recieve',req.body)
     try{
 		var doctor=new Doctor({
-                Name:req.body.name,
-                Education:req.body.education,
-                Speciality:req.body.speciality,
-                Experience:req.body.experience,
-                Email:req.body.email,
-                Phone:req.body.phone,
-                password:req.body.password,
+                Name:req.body.doctorinfo.name,
+                Education:req.body.doctorinfo.education,
+                Speciality:req.body.doctorinfo.speciality,
+                Experience:req.body.doctorinfo.experience,
+                Email:req.body.doctorinfo.email,
+                Phone:req.body.doctorinfo.phone,
+                password:req.body.doctorinfo.password,
             })
         Doctor.findOneAndUpdate(
 				{Name:req.body.old_name , Email:req.body.old_email},
 				doctor
 				).then(()=>{
-                
-                    return res.status(200).send({message:"Doctor information updated  successfully"});
+                if(req.body.doctorinfo.name!=req.body.old_name||req.body.email!=req.body.old_email){
+                    Note.update({org_name:req.body.old_name,org_address:req.body.old_email},
+                    {org_name:req.body.doctorinfo.name,org_address:req.body.doctorinfo.address})
+                }
+                console.log('i am here')
+                    var doc=Doctor.find({Name:req.body.doctorinfo.name,Email:req.body.doctorinfo.email})
+
+console.log('the doctor updated and send',doc)
+                    return res.status(200).send({doctor:doc});
                 }    
             )
     }

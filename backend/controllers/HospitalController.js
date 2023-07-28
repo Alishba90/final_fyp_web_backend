@@ -106,24 +106,20 @@ exports.UpdateHospital = [
 				hospital
 				).then(()=>{
                 
-                if(req.body.name!=req.body.old_name&&req.body.address!=req.body.old_address){
+                if(req.body.hospitalinfo.name!=req.body.old_name||req.body.hospitalinfo.address!=req.body.old_address){
                     Note.update({org_name:req.body.old_name,org_address:req.body.old_address},
-                    {org_name:req.body.name,org_address:req.body.address})
+                    {org_name:req.body.hospitalinfo.name,org_address:req.body.hospitalinfo.address})
 
                     HospitalDepartment.update({org_name:req.body.old_name,org_address:req.body.old_address},
-                    {org_name:req.body.name,org_address:req.body.address})
-
-                    Order.update({org_name:req.body.old_name,org_address:req.body.old_address},
-                    {org_name:req.body.name,org_address:req.body.address})
-
-                    Transaction.update({org_name:req.body.old_name,org_address:req.body.old_address},
-                    {org_name:req.body.name,org_address:req.body.address})
-
+                    {org_name:req.body.hospitalinfo.name,org_address:req.body.hospitalinfo.address})
 
                 }
 
+                    console.log('i am here')
+                    var h=Hospital.find({Name:req.body.hospitalinfo.name,Email:req.body.hospitalinfo.email})
 
-                    return res.status(200).send({message:"Hospital updated successfully"});
+                    console.log('the hospital updated and send',h)
+                    return res.status(200).send({hospital:h});
                 }    
             )
     }
