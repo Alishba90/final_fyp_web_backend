@@ -1,5 +1,8 @@
 const Blood = require("../models/BloodModel");
 const bcrypt = require('bcrypt');
+const Note=require('../models/NoteModel');
+const Transaction = require("../models/TransactionModel");
+
 // Blood Bank Schema
 function BloodData(data) {
     
@@ -82,42 +85,48 @@ exports.AddBloodBank = [
 
 //Update Blood Bank 
 exports.UpdateBloodBank = [
-
 	(req, res) => {
     console.log('this is recieve',req.body)
     try{
-        var blood=new Blood({
-            name:req.body.bloodbankinfo.name,
-            address:req.body.bloodbankinfo.address,
-            email:req.body.bloodbankinfo.email,
-            password :req.body.bloodbankinfo.password,
-            phone:req.body.bloodbankinfo.phone,
-            time:(req.body.bloodbankinfo.time.open===''||req.body.bloodbankinfo.time.close==='')?'24/7':settime(req.body.bloodbankinfo.time.open,req.body.bloodbankinfo.time.close)
 
-        })
         Blood.findOneAndUpdate(
-				{name:req.body.old_name , address:req.body.old_address},
-				blood
-				).then(()=>{
+          { name: req.body.old_name, address: req.body.old_address },
+          {
+            name: req.body.bloodbankinfo.name,
+            address: req.body.bloodbankinfo.address,
+            email: req.body.bloodbankinfo.email,
+            password: req.body.bloodbankinfo.password,
+            phone: req.body.bloodbankinfo.phone,
+            time: (req.body.bloodbankinfo.time.open === '' || req.body.bloodbankinfo.time.close === '')
+              ? '24/7'
+              : settime(req.body.bloodbankinfo.time.open, req.body.bloodbankinfo.time.close)
+          },
+          { new: true } // Add this option to return the updated document
+        ).then(()=>{
                 
                 
                 if(req.body.bloodbankinfo.name!=req.body.old_name||req.body.bloodbankinfo.address!=req.body.old_address){
-                    Note.update({org_name:req.body.old_name,org_address:req.body.old_address},
+                    Note.updateMany({org_name:req.body.old_name,org_address:req.body.old_address},
                     {org_name:req.body.bloodbankinfo.name,org_address:req.body.bloodbankinfo.address})
 
-                    Order.update({org_name:req.body.old_name,org_address:req.body.old_address},
-                    {org_name:req.body.bloodbankinfo.name,org_address:req.body.bloodbankinfo.address})
 
-                    Transaction.update({org_name:req.body.old_name,org_address:req.body.old_address},
+
+                    Transaction.updateMany({org_name:req.body.old_name,org_address:req.body.old_address},
                     {org_name:req.body.bloodbankinfo.name,org_address:req.body.bloodbankinfo.address})
 
 
                 }
                     console.log('i am here')
-                    var b=Blood.find({Name:req.body.bloodbankinfo.name,Email:req.body.bloodbankinfo.email})
-
+                    Blood.findOne({Name:req.body.bloodbankinfo.name,Email:req.body.bloodbankinfo.email}).then(b=>{
+                      if(b){
                     console.log('the bloodbank updated and send',b)
                     return res.status(200).send({bloodbank:b});
+
+                      }
+
+                    })
+
+
                 }    
             )
     }

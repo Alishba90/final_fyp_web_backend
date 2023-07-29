@@ -1,4 +1,5 @@
 const Pharmacy = require("../models/PharmacyModel.js");
+const Note=require('../models/NoteModel');
 
 const bcrypt = require('bcrypt');
 
@@ -112,15 +113,14 @@ exports.UpdatePharmacy = [
 				).then(()=>{
                 
                 if(req.body.pharmacyinfo.name!=req.body.old_name||req.body.pharmacyinfo.address!=req.body.old_address){
-                    Note.update({org_name:req.body.old_name,org_address:req.body.old_address},
+                    Note.updateMany({org_name:req.body.old_name,org_address:req.body.old_address},
                     {org_name:req.body.pharmacyinfo.pharmacyname,org_address:req.body.pharmacyinfo.address})
 
-                    Order.update({org_name:req.body.old_name,org_address:req.body.old_address},
+                    Order.updateMany({org_name:req.body.old_name,org_address:req.body.old_address},
                     {org_name:req.body.pharmacyinfo.pharmacyname,org_address:req.body.pharmacyinfo.address})
 
-                    Transaction.update({org_name:req.body.old_name,org_address:req.body.old_address},
+                    Transaction.updateMany({org_name:req.body.old_name,org_address:req.body.old_address},
                     {org_name:req.body.pharmacyinfo.pharmacyname,org_address:req.body.pharmacyinfo.address})
-
 
                 }
                     console.log('i am here')

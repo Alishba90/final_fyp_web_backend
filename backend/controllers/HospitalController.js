@@ -3,8 +3,6 @@ const apiResponse = require("../helpers/apiResponse");
 const HospitalDepartment=require("../models/DepartmentModel");
 const bcrypt = require('bcrypt');
 const Note= require('../models/NoteModel');
-const Order=require('../models/OrderModel');
-const Transaction=require('../models/TransactionModel');
 const Form=require('../models/NCRformsModel');
 
 // Hospital Schema
@@ -107,10 +105,10 @@ exports.UpdateHospital = [
 				).then(()=>{
                 
                 if(req.body.hospitalinfo.name!=req.body.old_name||req.body.hospitalinfo.address!=req.body.old_address){
-                    Note.update({org_name:req.body.old_name,org_address:req.body.old_address},
+                    Note.updateMany({org_name:req.body.old_name,org_address:req.body.old_address},
                     {org_name:req.body.hospitalinfo.name,org_address:req.body.hospitalinfo.address})
 
-                    HospitalDepartment.update({org_name:req.body.old_name,org_address:req.body.old_address},
+                    HospitalDepartment.updateMany({org_name:req.body.old_name,org_address:req.body.old_address},
                     {org_name:req.body.hospitalinfo.name,org_address:req.body.hospitalinfo.address})
 
                 }

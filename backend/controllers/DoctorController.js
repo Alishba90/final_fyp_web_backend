@@ -1,5 +1,7 @@
 const Doctor=require('../models/DoctorModel')
 const apiResponse = require("../helpers/apiResponse");
+const Note=require('../models/NoteModel');
+
 const bcrypt = require('bcrypt');
 // Doctor Schema
 function DoctorData(data) {
@@ -95,7 +97,7 @@ exports.UpdateDoctor = [
 				doctor
 				).then(()=>{
                 if(req.body.doctorinfo.name!=req.body.old_name||req.body.email!=req.body.old_email){
-                    Note.update({org_name:req.body.old_name,org_address:req.body.old_email},
+                    Note.updateMany({org_name:req.body.old_name,org_address:req.body.old_email},
                     {org_name:req.body.doctorinfo.name,org_address:req.body.doctorinfo.address})
                 }
                 console.log('i am here')
