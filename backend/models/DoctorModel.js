@@ -13,6 +13,7 @@ const ClinicSchema = new mongoose.Schema({
         }
       ]
   });
+
 const DoctorSchema = new mongoose.Schema({
 
     Name: {type: String, required: true},

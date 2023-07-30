@@ -1,8 +1,8 @@
 const Pharmacy = require("../models/PharmacyModel.js");
 const Note=require('../models/NoteModel');
-
+const Order = require("../models/OrderModel");
 const bcrypt = require('bcrypt');
-
+const Transaction=require('../models/TransactionModel.js')
 // Pharmacy Schema
 function PharmacyData(data) {
     
@@ -90,53 +90,57 @@ exports.AddPharmacy = [
     }
 ];
 
-//Update pharmacy 
+//update pharmacy
+
 exports.UpdatePharmacy = [
+  (req, res) => {
+    console.log('this is recieve', req.body);
+    try {
+      var pharmacy = {
+        pharmacyname: req.body.pharmacyinfo.pharmacyname,
+        address: req.body.pharmacyinfo.address,
+        email: req.body.pharmacyinfo.email,
+        password: req.body.pharmacyinfo.password,
+        phone: req.body.pharmacyinfo.phone,
+        time: settime(req.body.pharmacyinfo.time.open, req.body.pharmacyinfo.time.close)
+      };
 
-	(req, res) => {
-    console.log('this is recieve',req.body)
-    try{
-        var pharmacy=new Pharmacy(
-            {
-                pharmacyname:req.body.pharmacyinfo.pharmacyname,
-                address:req.body.pharmacyinfo.address,
-                email:req.body.pharmacyinfo.email,
-                password :req.body.pharmacyinfo.password,
-                phone:req.body.pharmacyinfo.phone,
-                time:settime(req.body.pharmacyinfo.time.open,req.body.pharmacyinfo.time.close)
-    
-                }    
-            )
-        Pharmacy.findOneAndUpdate(
-				{pharmacyname:req.body.old_name , address:req.body.old_address},
-				pharmacy
-				).then(()=>{
-                
-                if(req.body.pharmacyinfo.name!=req.body.old_name||req.body.pharmacyinfo.address!=req.body.old_address){
-                    Note.updateMany({org_name:req.body.old_name,org_address:req.body.old_address},
-                    {org_name:req.body.pharmacyinfo.pharmacyname,org_address:req.body.pharmacyinfo.address})
+      Pharmacy.findOneAndUpdate(
+        { pharmacyname: req.body.old_name, address: req.body.old_address },
+        pharmacy,
+        { new: true, omitUndefined: true } // Add options to return the updated document and omit undefined fields
+      ).then(updatedPharmacy => {
+        if (!updatedPharmacy) {
+          return res.status(404).send({ error: 'Pharmacy not found' });
+        }
 
-                    Order.updateMany({org_name:req.body.old_name,org_address:req.body.old_address},
-                    {org_name:req.body.pharmacyinfo.pharmacyname,org_address:req.body.pharmacyinfo.address})
+        if (req.body.pharmacyinfo.name !== req.body.old_name || req.body.pharmacyinfo.address !== req.body.old_address) {
+          Note.updateMany(
+            { org_name: req.body.old_name, org_address: req.body.old_address },
+            { org_name: req.body.pharmacyinfo.pharmacyname, org_address: req.body.pharmacyinfo.address }
+          );
 
-                    Transaction.updateMany({org_name:req.body.old_name,org_address:req.body.old_address},
-                    {org_name:req.body.pharmacyinfo.pharmacyname,org_address:req.body.pharmacyinfo.address})
+          Order.updateMany(
+            { org_name: req.body.old_name, org_address: req.body.old_address },
+            { org_name: req.body.pharmacyinfo.pharmacyname, org_address: req.body.pharmacyinfo.address }
+          );
 
-                }
-                    console.log('i am here')
-                    var p=Pharmacy.find({Name:req.body.pharmacyinfo.name,Email:req.body.pharmacyinfo.email})
+          Transaction.updateMany(
+            { org_name: req.body.old_name, org_address: req.body.old_address },
+            { org_name: req.body.pharmacyinfo.pharmacyname, org_address: req.body.pharmacyinfo.address }
+          );
+        }
 
-                    console.log('the pharmacy updated and send',p)
-                    return res.status(200).send({pharmacy:p});
-                }    
-            )
+        console.log('the pharmacy updated and send', updatedPharmacy);
+        return res.status(200).send({ pharmacy: updatedPharmacy });
+      });
+    } catch (err) {
+      console.log(err);
+      return res.status(430).send({ error: err });
     }
-    catch(err){
-        console.log(err);
-        return res.status(430).send({ error: err});
-    }
-    }
+  }
 ];
+
 
 //Delete pharmacy 
 exports.DeletePharmacy = [

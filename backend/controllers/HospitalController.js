@@ -418,57 +418,83 @@ exports.AddDepartment=[
     }
 ]
 
-//function to login into a department
-exports.LoginDepartment=[
-    async (req,res)=>{
-        console.log('this is recieved ',req.body)
-        try{
-            HospitalDepartment.find({org_name:req.body.org_name,org_address:req.body.org_address,name:req.body.name}).then(dept=>{
-                if(dept){
-                    console.log(dept)
-                    let department=dept[0]
 
-                    if(compare(department.password,req.body.password)){
-                        return res.status(200).send({user:department})
-                    }
-                    else{
-                        return res.status(430).send({error:'Please enter correct password'})
-                    }
-                }
-                else{
-                    return res.status(420).send({error:"No such department exist"})
-                }
-            })
-        }
-        catch(err){
-            console.log(err)
-        }
+
+// function to login into a department
+exports.LoginDepartment = [
+  async (req, res) => {
+    console.log('this is received ', req.body);
+    try {
+      HospitalDepartment.find({ org_name: req.body.org_name, org_address: req.body.org_address, name: req.body.name })
+        .then(async (dept) => {
+          if (dept.length > 0) { // Check if any department was found
+            console.log(dept);
+            let department = dept[0];
+
+            // Compare the provided password with the hashed password in the database
+            const isPasswordMatch = await bcrypt.compare(req.body.password, department.password);
+
+            if (isPasswordMatch) {
+
+              return res.status(200).send({ user: department });
+            } else {
+              return res.status(430).send({ error: 'Please enter correct password' });
+            }
+          } else {
+            return res.status(420).send({ error: "No such department exists" });
+          }
+        });
+    } catch (err) {
+      console.log(err);
+      return res.status(500).send({ error: err });
     }
-]
+  }
+];
+
 
 //function to delete department
-exports.deleteDepartment=[
-	async (req, res) => {
-    console.log('this is recieve',req.params)
-    try{
-		const hospital=Hospital.findOne({ name:req.params.org_name, address:req.params.org_address});
-        await HospitalDepartment.deleteOne(
-				{org_name:req.params.org_name , org_address:req.params.org_address,name:req.params.name},
-				
-				).then(()=>{
-                    hospital.Hospitaldr=hospital.Hospitaldr.filter((doc)=>doc.Department!==req.params.name)
-                    hospital.save()
-                    return res.status(200).send({message:"Hospital department deleted successfully"});
-                }    
-            )
 
+exports.deleteDepartment = [
+  async (req, res) => {
+    console.log('this is receive', req.body);
+    try {
+      const hospital = await Hospital.findOne({
+        name: req.body.org_name,
+        address: req.body.org_address,
+      });
+
+      if (!hospital) {
+        return res.status(404).send({ message: "Hospital not found" });
+      }
+        var msg="Problem deleting department"
+        HospitalDepartment.findOne({
+        org_name: req.body.org_name,
+        org_address: req.body.org_address,
+        name: req.body.dep_name
+        }).then(async (d) => {
+        if (d) {
+            const isPasswordMatch = await bcrypt.compare(req.body.password, d.password);
+            if (isPasswordMatch) {
+            console.log('Password matches'); // Password is correct, you can delete now
+            await HospitalDepartment.deleteOne({
+                org_name: req.body.org_name,
+                org_address: req.body.org_address,
+                name: req.body.dep_name,
+            });
+            
+            }msg="Hospital department deleted successfully"
+        }})
+
+
+      await hospital.save();
+
+      return res.status(200).send({ message: msg });
+    } catch (err) {
+      console.log(err);
+      return res.status(500).send({ error: err });
     }
-    catch(err){
-        console.log(err);
-        return res.status(430).send({ error: err});
-    }
-    }
-]
+  }
+];
 
 //function to update department
 exports.updateDepartment=[
@@ -478,10 +504,10 @@ exports.updateDepartment=[
 		var department=new HospitalDepartment({
                             org_name:req.body.org_name,
 	                        org_address:req.body.org_address,
-	                        name:req.body.name,
-                            admin_name:req.body.admin_name,
-	                        password:req.body.password,
-	                        phone:req.body.phone,
+	                        name:req.body.depinfo.name,
+                            admin_name:req.body.depinfo.admin_name,
+	                        password:req.body.depinfo.password,
+	                        phone:req.body.depinfo.phone,
 	
         })
         HospitalDepartment.findOneAndUpdate(
@@ -494,14 +520,14 @@ exports.updateDepartment=[
                             if(docs){
                                 for(var i=0;i<docs.length;i++){
                                     if(docs[i].Department===req.body.old_name){
-                                        docs[i].Department=req.body.name;
+                                        docs[i].Department=req.body.depinfo.name;
                                     }
                                 }
                             }
                         H.save()
                         }
                     })
-                    return res.status(200).send({message:"Department updated successfully"});
+                    return res.status(200).send({department:department});
                 }    
             )
     }

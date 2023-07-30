@@ -20,7 +20,7 @@ router.get("/getdeptdetail/:org_name/:org_address/:department", HospitalControll
 router.post("/logindep", HospitalController.LoginDepartment);
 router.post("/adddep", HospitalController.AddDepartment);
 router.post("/updatedep", HospitalController.updateDepartment);
-router.delete("/deldep/:org_name/:org_address/:name", HospitalController.deleteDepartment);
+router.post("/deldep", HospitalController.deleteDepartment);
 
 router.get("/getforms/:org_name/:org_address", HospitalController.GetNCRforms);
 router.post("/storeforms", HospitalController.saveNCRforms);
