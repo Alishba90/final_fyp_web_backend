@@ -9,6 +9,14 @@ const NCRformsSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
+  form_description: {
+    type: String,
+    required: true,
+  },
+  form_department: {
+    type: String,
+    required: true,
+  },
    form_type: {
     type: String,
     required: true,

@@ -564,7 +564,7 @@ exports.departmentDoctors=[
 ]
 
 //function to retrieve all NCR forms
-exports.GetNCRforms=[
+exports.bGetNCRforms=[
   async (req, res) => {
     console.log('this is received', req.body);
 
@@ -602,7 +602,9 @@ exports.saveNCRforms=[
                 org_address:req.body.org_address,
                 form_type:req.body.depinfo.form_type,
                 form_date:req.body.depinfo.form_date,
-                form_no:req.body.depinfo.phone,   
+                form_department:req.body.depinfo.form_department,
+                form_description:req.body.depinfo.form_description,
+                form_no:req.body.depinfo.form_no,   
                 form_title:req.body.depinfo.form_title,
                 entree_name:req.body.depinfo.entree_name,
                 resolution_description:req.body.depinfo.resolution_description,
@@ -644,7 +646,6 @@ exports.resolveNCRforms=[
         }else{
             console.log("No form exist with this number");
             return res.status(430).send({ error: "No form exist with this number." });
-
         }
     })
     }
