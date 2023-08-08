@@ -565,7 +565,7 @@ exports.departmentDoctors=[
 ]
 
 //function to retrieve all NCR forms
-exports.bGetNCRforms=[
+exports.GetNCRforms=[
   async (req, res) => {
     console.log('this is received', req.body);
 
