@@ -9,7 +9,7 @@ router.post("/update", BloodController.UpdateBloodBank);
 router.post("/login", BloodController.LoginBloodBank);
 router.get("/branch/:name", BloodController.BloodBankBranches);
 router.delete("/del/:name/:address", BloodController.DeleteBloodBank);
-
+router.get("/stats/:name/:address", BloodController.BloodBankStats);
 
 router.get("/getblood/:org_name/:org_address", BloodController.AllBloodGroups);
 router.post("/updatebloodgroup", BloodController.updateBloodGroup);

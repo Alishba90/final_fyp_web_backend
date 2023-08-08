@@ -364,3 +364,89 @@ exports.AddBloodGroup=[
     }
   }
 ]
+
+//To get Blood Bank stats
+exports.BloodBankStats = [
+    (req, res) => {
+        console.log('this is received for stats', req.params);
+        try {
+            var currentDatetransact = new Date().toLocaleDateString('en-GB');
+            currentDatetransact = parseInt(currentDatetransact.split('/')[0]) + '/' + parseInt(currentDatetransact.split('/')[1]) + '/' + parseInt(currentDatetransact.split('/')[2]);
+            currentDatetransact = currentDatetransact.toString();
+
+            // Get the date exactly one week ago from the current date
+            var oneWeekAgo = new Date();
+            oneWeekAgo.setDate(oneWeekAgo.getDate() - 7);
+            oneWeekAgo = oneWeekAgo.toLocaleDateString('en-GB');
+            oneWeekAgo = parseInt(oneWeekAgo.split('/')[0]) + '/' + parseInt(oneWeekAgo.split('/')[1]) + '/' + parseInt(oneWeekAgo.split('/')[2]);
+            oneWeekAgo = oneWeekAgo.toString();
+
+            let transac_amount_today = 0;
+            let transac_amount_week = 0;
+            let item_sold_today = 0;
+            let popular_blood = '';
+
+            // Total amount of sales for the day
+            Transaction.aggregate([
+                { $match: { org_name: req.params.name, org_address: req.params.address, date: currentDatetransact } },
+                { $group: { _id: null, totalAmountToday: { $sum: '$amount' } } }
+            ]).exec().then(resultToday => {
+                if (resultToday[0]) {
+                    transac_amount_today = resultToday[0].totalAmountToday;
+                }
+
+                // Total amount of sales for the past week
+                return Transaction.aggregate([
+                    { $match: { org_name: req.params.name, org_address: req.params.address, date: { $gte: oneWeekAgo, $lte: currentDatetransact } } },
+                    { $group: { _id: null, totalAmountWeek: { $sum: '$amount' } } }
+                ]).exec();
+            }).then(resultWeek => {
+                if (resultWeek[0]) {
+                    transac_amount_week = resultWeek[0].totalAmountWeek;
+                }
+
+                // Calculate total number of items sold for the day
+                return Transaction.aggregate([
+                    { $match: { org_name: req.params.name, org_address: req.params.address, date: currentDatetransact } },
+                    { $unwind: '$items' },
+                    { $group: { _id: null, totalItemsSold: { $sum: { $toInt: '$items.quantity' } } } }
+                ]).exec();
+            }).then(resultItemsSold => {
+                if (resultItemsSold[0]) {
+                    item_sold_today = resultItemsSold[0].totalItemsSold;
+                }
+
+                // Get the popular item based on both transactions and orders
+                return Promise.all([
+                    Transaction.aggregate([
+                        { $match: { org_name: req.params.name, org_address: req.params.address } },
+                        { $unwind: '$items' },
+                        { $group: { _id: '$items.name', totalQuantity: { $sum: { $toInt: '$items.quantity' } } } },
+                        { $sort: { totalQuantity: -1 } },
+                        { $limit: 1 }
+                    ]).exec()
+                ]);
+            }).then(([transactionResult]) => {
+                if (transactionResult[0] ) {
+                    popular_blood = transactionResult[0]._id;
+                } 
+
+                console.log('..................................................', popular_blood, transac_amount_today, transac_amount_week, item_sold_today);
+
+                // Send the response
+                return res.status(200).json({
+                    popular_blood: popular_blood,
+                    transac_amount_today: transac_amount_today,
+                    transac_amount_week: transac_amount_week,
+                    item_sold_today: item_sold_today
+                });
+            }).catch(err => {
+                console.log(err);
+                return res.status(430).json({ error: err });
+            });
+        } catch (err) {
+            console.log(err);
+            return res.status(430).json({ error: err });
+        }
+    }
+];

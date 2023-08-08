@@ -567,12 +567,13 @@ exports.departmentDoctors=[
 //function to retrieve all NCR forms
 exports.GetNCRforms=[
   async (req, res) => {
-    console.log('this is received', req.body);
+    console.log('this is received for form', req.params);
 
     try {
-        Form.find({org_name:req.params.org_name,org_address:req.params.org_address}).then(f=>{
+        Form.find({org_name:req.params.org_name,org_address:req.params.org_address}).then(f=>{console.log(',,,,,,,,,,,,,,',f)
             if(f.length){
                 var forms=f;
+            
                 return res.status(200).send({forms:forms})
             }
             else{

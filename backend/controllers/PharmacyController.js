@@ -168,8 +168,6 @@ exports.PharmacyStats = [
     }
 ];
 
-
-
 //Add a new pharmacy 
 exports.AddPharmacy = [
 
