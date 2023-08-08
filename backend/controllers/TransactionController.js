@@ -48,23 +48,39 @@ exports.LastTransaction = [
     }
   },
 ];
+
 //function to add a new transaction for pharmacies
 exports.addTransactionMeds=[
 	async (req, res) => {
-    console.log('this is recieved',req.body)
+    
     try{
         
            await Pharmacy.find({
             pharmacyname: req.body.org_name, address:req.body.address 
             }).then(pharmacy=>{  
             if (pharmacy.length) {
-                console.log('hi')
+                
                 req.body.transactioninfo.items.map((i,ind)=>{
                     
-                    console.log(pharmacy[0].medicine)
+                    
                     pharmacy[0].medicine.forEach((medicine) => {
                         if (medicine.name === i.name) {
-                        medicine.quantity -= parseInt(i.quantity);
+                            if(medicine.quantity===parseInt(i.quantity)){
+                                const pharmacy = Pharmacy.findOne({ pharmacyname: req.body.name, address:req.body.address });
+                                    if (pharmacy) {
+
+                                        pharmacy.medicine = pharmacy.medicine.filter(
+                                            (med) => med.name !== i.name
+                                        );
+                                        
+                                        pharmacy.save();
+
+                                    }
+
+                            }
+                            else{
+                                medicine.quantity -= parseInt(i.quantity);
+                            }
                         }
                     });
                     });
@@ -101,7 +117,6 @@ exports.addTransactionMeds=[
      }
 ]
 
-
 //function to add a new transaction for bloodbank
 exports.addTransactionBlood=[
 	 (req, res) => {
@@ -114,7 +129,7 @@ exports.addTransactionBlood=[
             })  
             if (blood) {
                 req.body.transactioninfo.items.map((i,ind)=>{
-
+                    
                     blood.BloodGroup.updateOne(
                         {AvailableBloodGroup:i.name},
                         {quantity:parseInt(quantity)-parseInt(i.quantity)}

@@ -526,6 +526,7 @@ exports.updateDepartment=[
                             }
                         H.save()
                         }
+
                     })
                     return res.status(200).send({department:department});
                 }    

@@ -5,6 +5,7 @@ const MedicineController = require("../controllers/MedicineController.js");
 var router = express.Router();
 
 router.get("/detail/:name/:address", PharmacyController.PharmacyDetail);
+router.get("/stats/:name/:address", PharmacyController.PharmacyStats);
 router.post("/add", PharmacyController.AddPharmacy);
 router.post("/update", PharmacyController.UpdatePharmacy);
 router.get("/branch/:name", PharmacyController.PharmacyBranches);

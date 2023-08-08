@@ -89,14 +89,14 @@ exports.deleteSelectedMedicines = [
 exports.allMedicines = [
 	
 	async (req, res) => {
-    console.log('this is recieve',req.params)
+    
     try{
         await Pharmacy.findOne({pharmacyname:req.params.org_name , address:req.params.org_address}).then(pharma=>{
 
                 if(pharma){
-                        
+                    
                     var medicines=pharma.medicine
-
+                    
                     return res.status(200).send({ medicines:medicines});
                 }
                 else{

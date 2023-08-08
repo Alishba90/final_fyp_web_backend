@@ -50,6 +50,126 @@ exports.PharmacyDetail = [
     }
 ];
 
+//To get Pharmacy stats
+exports.PharmacyStats = [
+    (req, res) => {
+        console.log('this is received for stats', req.params);
+        try {
+            var currentDateorder = new Date().toLocaleDateString('en-GB');
+            
+            currentDateorder=parseInt(currentDateorder.split('/')[2])+ '-'+currentDateorder.split('/')[1]+ '-'+currentDateorder.split('/')[0];
+            currentDateorder=currentDateorder.toString()
+            console.log(currentDateorder)
+
+            var currentDatetransact = new Date().toLocaleDateString('en-GB');
+            currentDatetransact = parseInt(currentDatetransact.split('/')[0]) + '/' + parseInt(currentDatetransact.split('/')[1]) + '/' + parseInt(currentDatetransact.split('/')[2]);
+            currentDatetransact = currentDatetransact.toString();
+
+            // Get the date exactly one week ago from the current date
+            var oneWeekAgo = new Date();
+            oneWeekAgo.setDate(oneWeekAgo.getDate() - 7);
+            oneWeekAgo = oneWeekAgo.toLocaleDateString('en-GB');
+            oneWeekAgo = parseInt(oneWeekAgo.split('/')[0]) + '/' + parseInt(oneWeekAgo.split('/')[1]) + '/' + parseInt(oneWeekAgo.split('/')[2]);
+            oneWeekAgo = oneWeekAgo.toString();
+
+            let transac_amount_today = 0;
+            let transac_amount_week = 0;
+            let total_orders_today = 0;
+            let pending_orders_today = 0;
+            let item_sold_today = 0;
+            let popular_med = '';
+
+            // Total amount of sales for the day
+            Transaction.aggregate([
+                { $match: { org_name: req.params.name, org_address: req.params.address, date: currentDatetransact } },
+                { $group: { _id: null, totalAmountToday: { $sum: '$amount' } } }
+            ]).exec().then(resultToday => {
+                if (resultToday[0]) {
+                    transac_amount_today = resultToday[0].totalAmountToday;
+                }
+
+                // Total amount of sales for the past week
+                return Transaction.aggregate([
+                    { $match: { org_name: req.params.name, org_address: req.params.address, date: { $gte: oneWeekAgo, $lte: currentDatetransact } } },
+                    { $group: { _id: null, totalAmountWeek: { $sum: '$amount' } } }
+                ]).exec();
+            }).then(resultWeek => {
+                if (resultWeek[0]) {
+                    transac_amount_week = resultWeek[0].totalAmountWeek;
+                }
+
+                // For orders today
+                return Order.countDocuments({ date: currentDateorder, org_name: req.params.name, org_address: req.params.address });
+            }).then(todayOrders => {
+                total_orders_today = todayOrders;
+
+                // For today orders pending
+                return Order.countDocuments({ date: currentDateorder, org_name: req.params.name, org_address: req.params.address, status: 'pending' });
+            }).then(todayPendingOrders => {
+                pending_orders_today = todayPendingOrders;
+
+
+                // Calculate total number of items sold for the day
+                return Transaction.aggregate([
+                    { $match: { org_name: req.params.name, org_address: req.params.address, date: currentDatetransact } },
+                    { $unwind: '$items' },
+                    { $group: { _id: null, totalItemsSold: { $sum: { $toInt: '$items.quantity' } } } }
+                ]).exec();
+            }).then(resultItemsSold => {
+                if (resultItemsSold[0]) {
+                    item_sold_today = resultItemsSold[0].totalItemsSold;
+                }
+
+                // Get the popular item based on both transactions and orders
+                return Promise.all([
+                    Transaction.aggregate([
+                        { $match: { org_name: req.params.name, org_address: req.params.address } },
+                        { $unwind: '$items' },
+                        { $group: { _id: '$items.name', totalQuantity: { $sum: { $toInt: '$items.quantity' } } } },
+                        { $sort: { totalQuantity: -1 } },
+                        { $limit: 1 }
+                    ]).exec(),
+                    Order.aggregate([
+                        { $match: { org_name: req.params.name, org_address: req.params.address } },
+                        { $unwind: '$items' },
+                        { $group: { _id: '$items.name', totalQuantity: { $sum: { $toInt: '$items.quantity' } } } },
+                        { $sort: { totalQuantity: -1 } },
+                        { $limit: 1 }
+                    ]).exec()
+                ]);
+            }).then(([transactionResult, orderResult]) => {
+                if (transactionResult[0] && orderResult[0]) {
+                    popular_med = transactionResult[0]._id;
+                } else if (transactionResult[0]) {
+                    popular_med = transactionResult[0]._id;
+                } else if (orderResult[0]) {
+                    popular_med = orderResult[0]._id;
+                }
+
+                console.log('..................................................', popular_med, pending_orders_today, total_orders_today, transac_amount_today, transac_amount_week, item_sold_today);
+
+                // Send the response
+                return res.status(200).json({
+                    popular_med: popular_med,
+                    pending_orders_today: pending_orders_today,
+                    total_orders_today: total_orders_today,
+                    transac_amount_today: transac_amount_today,
+                    transac_amount_week: transac_amount_week,
+                    item_sold_today: item_sold_today
+                });
+            }).catch(err => {
+                console.log(err);
+                return res.status(430).json({ error: err });
+            });
+        } catch (err) {
+            console.log(err);
+            return res.status(430).json({ error: err });
+        }
+    }
+];
+
+
+
 //Add a new pharmacy 
 exports.AddPharmacy = [
 
