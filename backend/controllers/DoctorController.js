@@ -172,3 +172,59 @@ exports.LoginDoctor=[
         }
     }
 ]
+
+//get schedule
+exports.DoctorSchedule = [
+
+	async (req, res) => {
+    console.log('this is recieve',req.params)
+    try{
+        await Doctor.findOne({Name:req.params.name , Email:req.params.email}).then(dr=>{
+                if(dr){
+                    console.log('................',dr)    
+                    var doctor=new DoctorData(dr)
+                    var schedule=doctor.Hospitals
+                    if(schedule.length){
+                        // Initialize an empty array to store the new formatted data
+                        var formattedSchedule = [];
+                        const findDay = (day) => {
+                            return formattedSchedule.find(entry => entry.day === day);
+                        };
+
+                        // Iterate through each entry in the 'availability' array
+                        schedule.forEach(entry => {
+                            entry.availability.forEach(availabilityEntry => {
+                                // Find or create a day entry in the formattedSchedule array
+                                let dayEntry = findDay(availabilityEntry.day);
+                                if (!dayEntry) {
+                                    dayEntry = { day: availabilityEntry.day, availability: [] };
+                                    formattedSchedule.push(dayEntry);
+                                }
+
+
+                                // Push the availability information into the day entry
+                                dayEntry.availability.push({
+                                    name: entry.name,
+                                    time: availabilityEntry.time
+                                });
+                            });
+                        });
+
+                    }
+                    else{
+                        var formattedSchedule = [{day:'',availability:[{name:'',time:[]}]}];
+                    }
+                    console.log('the schedule i am sending',formattedSchedule)
+                    return res.status(200).send({schedule:formattedSchedule});
+                }
+                else{
+                    return res.status(430).send({ null_data:"No such doctor found"});
+                }    
+            })
+    }
+    catch(err){
+        console.log(err);
+        return res.status(430).send({ error: err});
+    }
+    }
+];

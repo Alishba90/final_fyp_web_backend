@@ -116,15 +116,14 @@ exports.UpdateBloodBank = [
 
 
                 }
-                    console.log('i am here')
-                    Blood.findOne({Name:req.body.bloodbankinfo.name,Email:req.body.bloodbankinfo.email}).then(b=>{
-                      if(b){
-                    console.log('the bloodbank updated and send',b)
-                    return res.status(200).send({bloodbank:b});
-
-                      }
-
-                    })
+                    console.log('i am here',req.body.bloodbankinfo,req.body.bloodbankinfo.email)
+                    Blood.findOne({ name: req.body.bloodbankinfo.name, email: req.body.bloodbankinfo.email })
+                        .then(b => {
+                            if (b) {
+                                console.log('the bloodbank updated and send', b);
+                                return res.status(200).send({ bloodbank: b });
+                            }
+                        })
 
 
                 }    
