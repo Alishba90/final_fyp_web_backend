@@ -65,22 +65,10 @@ exports.addTransactionMeds=[
                     
                     pharmacy[0].medicine.forEach((medicine) => {
                         if (medicine.name === i.name) {
-                            if(medicine.quantity===parseInt(i.quantity)){
-                                const pharmacy = Pharmacy.findOne({ pharmacyname: req.body.name, address:req.body.address });
-                                    if (pharmacy) {
 
-                                        pharmacy.medicine = pharmacy.medicine.filter(
-                                            (med) => med.name !== i.name
-                                        );
-                                        
-                                        pharmacy.save();
-
-                                    }
-
-                            }
-                            else{
+                            
                                 medicine.quantity -= parseInt(i.quantity);
-                            }
+                            
                         }
                     });
                     });
@@ -119,35 +107,41 @@ exports.addTransactionMeds=[
 
 //function to add a new transaction for bloodbank
 exports.addTransactionBlood=[
-	 (req, res) => {
+	 async (req, res) => {
     console.log('this is recieve',req.body)
 
     try{
-
-            const blood=Blood.findOne({
-            name: req.body.org_name, address:req.body.org_address 
-            })  
-            if (blood) {
+            await Blood.find({
+                name: req.body.org_name, address:req.body.address 
+            }).then(blood=>{
+             
+            if (blood.length) {
                 req.body.transactioninfo.items.map((i,ind)=>{
                     
-                    blood.BloodGroup.updateOne(
-                        {AvailableBloodGroup:i.name},
-                        {quantity:parseInt(quantity)-parseInt(i.quantity)}
-                    ).then(()=>{
-                        console.log("Blood Group stock updated successfully");
-                        
+                    
+                    blood[0].BloodGroup.forEach((b) => {
+                        if (b.AvailableBloodGroup === i.name) {
+
+                                b.quantity -= parseInt(i.quantity);
+                            
                         }
-                    )
-                })
+                    });
+                    });
+                    try{
+                        blood[0].save();
+                        console.log("Blood Group stock updated successfully");
+                    }catch(e){
+                        console.log("problem updating blood stock",e);
+                    }
 
             }
             else{
                 return res.status(430).send({ error: err});
             }
-
+            })
             let transaction=new Transaction({
                 org_name:req.body.org_name,
-                org_address:req.body.org_address,
+                org_address:req.body.address,
                 items:req.body.transactioninfo.items,
                 date:req.body.transactioninfo.date,
                 amount:req.body.transactioninfo.amount,

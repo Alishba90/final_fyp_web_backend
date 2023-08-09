@@ -368,7 +368,7 @@ exports.AddBloodGroup=[
 //To get Blood Bank stats
 exports.BloodBankStats = [
     (req, res) => {
-        console.log('this is received for stats', req.params);
+     
         try {
             var currentDatetransact = new Date().toLocaleDateString('en-GB');
             currentDatetransact = parseInt(currentDatetransact.split('/')[0]) + '/' + parseInt(currentDatetransact.split('/')[1]) + '/' + parseInt(currentDatetransact.split('/')[2]);
@@ -431,7 +431,6 @@ exports.BloodBankStats = [
                     popular_blood = transactionResult[0]._id;
                 } 
 
-                console.log('..................................................', popular_blood, transac_amount_today, transac_amount_week, item_sold_today);
 
                 // Send the response
                 return res.status(200).json({

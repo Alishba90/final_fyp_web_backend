@@ -21,11 +21,14 @@ exports.addMedicine = [
         for (let i = 0; i < medList.length; i++) {
           const med = medList[i];
 
-          const existingMedicine = pharmacy.medicine.find(m => m.name === med.name && m.category === med.category);
+          const existingMedicine = pharmacy.medicine.find(m => m.name === med.name);
 
           if (existingMedicine) {
             existingMedicine.price = med.price;
             existingMedicine.quantity =parseInt(existingMedicine.quantity)+ parseInt(med.quantity);
+            if(!existingMedicine.category.toLowerCase().includes(med.category.toLowerCase())){
+              existingMedicine.category=existingMedicine.category+','+med.category;
+            }
           } else {
             pharmacy.medicine.push({
               name: med.name,

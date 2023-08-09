@@ -570,7 +570,7 @@ exports.GetNCRforms=[
     console.log('this is received for form', req.params);
 
     try {
-        Form.find({org_name:req.params.org_name,org_address:req.params.org_address}).then(f=>{console.log(',,,,,,,,,,,,,,',f)
+        Form.find({org_name:req.params.org_name,org_address:req.params.org_address}).then(f=>{
             if(f.length){
                 var forms=f;
             
