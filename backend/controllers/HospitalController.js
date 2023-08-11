@@ -387,7 +387,7 @@ exports.AddDepartment=[
 	 (req, res) => {
     console.log('this is recieve',req.body)
     try{
-        NCR.findOne({}).then((dept) => {
+        HospitalDepartment.findOne({org_name:req.body.org_name,org_address:req.body.org_address,name:req.body.depinfo.name}).then((dept) => {
         if(dept){
             console.log("A department already exist with this name");
             return res.status(430).send({ error: "A department already exist with this name." });
@@ -399,7 +399,6 @@ exports.AddDepartment=[
                 admin_name:req.body.depinfo.admin_name,
                 phone:req.body.depinfo.phone,   
                 password:req.body.depinfo.password
-
         })
             try{
             dep.save();
@@ -506,7 +505,9 @@ exports.updateDepartment=[
 	                        org_address:req.body.org_address,
 	                        name:req.body.depinfo.name,
                             admin_name:req.body.depinfo.admin_name,
-	                        password:req.body.depinfo.password,
+	                        password:(req.body.depinfo.changepw!=0)?req.body.depinfo.password:HospitalDepartment.findOne(
+                                {org_name:req.body.org_name , org_address:req.body.org_address,name:req.body.old_name}
+                                ).password,
 	                        phone:req.body.depinfo.phone,
 	
         })
@@ -525,10 +526,11 @@ exports.updateDepartment=[
                                 }
                             }
                         H.save()
+                        return res.status(200).send({department:department});
                         }
 
                     })
-                    return res.status(200).send({department:department});
+                    
                 }    
             )
     }

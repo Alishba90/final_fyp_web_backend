@@ -176,46 +176,17 @@ exports.LoginDoctor=[
 //get schedule
 exports.DoctorSchedule = [
 
-	async (req, res) => {
+	(req, res) => {
     console.log('this is recieve',req.params)
     try{
-        await Doctor.findOne({Name:req.params.name , Email:req.params.email}).then(dr=>{
+         Doctor.findOne({Name:req.params.name , Email:req.params.email}).then(dr=>{
                 if(dr){
                        
                     var doctor=new DoctorData(dr)
                     var schedule=doctor.Hospitals
-                    if(schedule.length){
-                        // Initialize an empty array to store the new formatted data
-                        var formattedSchedule = [];
-                        const findDay = (day) => {
-                            return formattedSchedule.find(entry => entry.day === day);
-                        };
-
-                        // Iterate through each entry in the 'availability' array
-                        schedule.forEach(entry => {
-                            entry.availability.forEach(availabilityEntry => {
-                                // Find or create a day entry in the formattedSchedule array
-                                let dayEntry = findDay(availabilityEntry.day);
-                                if (!dayEntry) {
-                                    dayEntry = { day: availabilityEntry.day, availability: [] };
-                                    formattedSchedule.push(dayEntry);
-                                }
-
-
-                                // Push the availability information into the day entry
-                                dayEntry.availability.push({
-                                    name: entry.name,
-                                    time: availabilityEntry.time
-                                });
-                            });
-                        });
-
-                    }
-                    else{
-                        var formattedSchedule = [{day:'',availability:[{name:'',time:[]}]}];
-                    }
                     
-                    return res.status(200).send({schedule:formattedSchedule});
+                    console.log(schedule)
+                    return res.status(200).send({schedule:schedule});
                 }
                 else{
                     return res.status(430).send({ null_data:"No such doctor found"});
@@ -229,9 +200,36 @@ exports.DoctorSchedule = [
     }
 ];
 
+//get schedule for edit
+exports.DoctorScheduleEdit = [
+	(req, res) => {
+    console.log('this is recieve jsddddddddddddddddddddddddddddddddddddddd',req.params)
+    try{
+        Doctor.findOne({Name:req.params.name , Email:req.params.email}).then(dr=>{
+                if(dr){
+                       
+                    var doctor=new DoctorData(dr)
+                    var schedule=doctor.Hospitals
+                    console.log('mmmmmmmmmmmmmmm',schedule)
+                    
+                    return res.status(200).send({schedule:schedule});
+                }
+                else{
+                    return res.status(430).send({ null_data:"No such doctor found"});
+                }    
+            })
+    }
+    catch(err){
+        console.log(err);
+        return res.status(430).send({ error: err});
+    }
+    }];
+
+
 exports.DoctorAppointments = async (req, res) => {
     console.log('this is receive app', req.params);
     try {
+        /*const dr = await Doctor.findOne({ Name: req.params.name, Email: req.params.email });*/
         const dr = await Doctor.findOne({ Name: 'Dr Zainabb', Email: 'SHAEENkhan90@gmail.com' });
         if (dr) {
             const appointments = await Appointment.find({ doctorId: dr._id }).exec();
