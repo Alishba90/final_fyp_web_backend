@@ -10,6 +10,8 @@ function PharmacyData(data) {
 	this.address =data.address;
 	this.email=data.email;
 	this.password =data.password;
+    this.longitude=data.longitude;
+    this.latitude=data.latitude;
 	this.phone=data.phone;
 	this.city =data.city;
 	this.time=data.time;
@@ -187,6 +189,8 @@ exports.AddPharmacy = [
 	                        address:req.body.address,
 	                        email:req.body.email,
 	                        password :req.body.password,
+                            longitude:req.body.longitude,
+                            latitude:req.body.latitude,
 	                        phone:req.body.phone,
 	                        city:req.body.city,
 	                        time:settime(req.body.time.open,req.body.time.close)

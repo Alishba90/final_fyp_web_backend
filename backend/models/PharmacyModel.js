@@ -14,6 +14,14 @@ const PharmacySchema = new mongoose.Schema({
         type: String,
         required: true
     },
+    longitude: {
+        type: String,
+    
+      },
+      latitude: {
+        type: String,
+    
+      },
     address: {
         type: String,
         required: true
@@ -39,7 +47,19 @@ const PharmacySchema = new mongoose.Schema({
         type: String,
         required: true,
     },
-    medicine:[MedicineSchema]
+    medicine:[MedicineSchema],
+    coordinates: {
+        // Add the coordinates field for geospatial indexing
+        type: {
+          type: String,
+          enum: ["Point"],
+          default: "Point",
+        },
+        coordinates: {
+          type: [Number], // [longitude, latitude]
+          index: "2dsphere", // Create a 2dsphere index for geospatial queries
+        }
+    }
 },
     { timestamps: true });
 

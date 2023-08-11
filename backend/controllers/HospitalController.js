@@ -12,6 +12,8 @@ function HospitalData(data) {
 	this.address =data.address;
 	this.email=data.email;
 	this.password =data.password;
+    this.longitude=data.longitude;
+    this.latitude=data.latitude;
 	this.phone=data.phone;
 	this.time=data.time;
 	this.Hospitaldr=data.Hospitaldr;
@@ -67,6 +69,8 @@ exports.AddHospital = [
                             name:req.body.name,
 	                        address:req.body.address,
 	                        email:req.body.email,
+                            longitude:req.body.longitude,
+                            latitude:req.body.latitude,
 	                        password:req.body.password,
 	                        phone:req.body.phone,
 	                        time:settime(req.body.time.open,req.body.time.close)

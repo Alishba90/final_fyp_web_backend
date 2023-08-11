@@ -26,6 +26,14 @@ const BloodBankSchema = new mongoose.Schema({
     type: String,
 
   },
+  longitude: {
+    type: String,
+
+  },
+  latitude: {
+    type: String,
+
+  },
 BloodGroup: [
   {
     AvailableBloodGroup: String,
@@ -33,7 +41,18 @@ BloodGroup: [
     quantity: Number,
     
   }
-]
+],coordinates: {
+  // Add the coordinates field for geospatial indexing
+  type: {
+    type: String,
+    enum: ["Point"],
+    default: "Point",
+  },
+  coordinates: {
+    type: [Number], // [longitude, latitude]
+    index: "2dsphere", // Create a 2dsphere index for geospatial queries
+  }
+}
 })
 BloodBankSchema.pre('save', async function(next){
     const blood= this;

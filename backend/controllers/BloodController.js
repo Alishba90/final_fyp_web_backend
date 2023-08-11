@@ -7,6 +7,8 @@ const Transaction = require("../models/TransactionModel");
 function BloodData(data) {
     
     this.name =data.name;
+    this.longitude=data.longitude;
+    this.latitude=data.latitude;
 	this.address =data.address;
 	this.email=data.email;
 	this.password =data.password;
@@ -63,6 +65,8 @@ exports.AddBloodBank = [
                 else{
                     var blood=new Blood({
                         name:req.body.name,
+                        longitude:req.body.longitude,
+                        latitude:req.body.latitude,
 	                    address:req.body.address,
 	                    email:req.body.email,
 	                    password :req.body.password,
