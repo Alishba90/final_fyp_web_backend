@@ -1,7 +1,7 @@
 const Doctor=require('../models/DoctorModel')
 const apiResponse = require("../helpers/apiResponse");
 const Note=require('../models/NoteModel');
-
+const Appointment=require('../models/Appointmentmodel')
 const bcrypt = require('bcrypt');
 // Doctor Schema
 function DoctorData(data) {
@@ -181,7 +181,7 @@ exports.DoctorSchedule = [
     try{
         await Doctor.findOne({Name:req.params.name , Email:req.params.email}).then(dr=>{
                 if(dr){
-                    console.log('................',dr)    
+                       
                     var doctor=new DoctorData(dr)
                     var schedule=doctor.Hospitals
                     if(schedule.length){
@@ -214,7 +214,7 @@ exports.DoctorSchedule = [
                     else{
                         var formattedSchedule = [{day:'',availability:[{name:'',time:[]}]}];
                     }
-                    console.log('the schedule i am sending',formattedSchedule)
+                    
                     return res.status(200).send({schedule:formattedSchedule});
                 }
                 else{
@@ -228,3 +228,20 @@ exports.DoctorSchedule = [
     }
     }
 ];
+
+exports.DoctorAppointments = async (req, res) => {
+    console.log('this is receive app', req.params);
+    try {
+        const dr = await Doctor.findOne({ Name: 'Dr Zainabb', Email: 'SHAEENkhan90@gmail.com' });
+        if (dr) {
+            const appointments = await Appointment.find({ doctorId: dr._id }).exec();
+            console.log(appointments);
+            return res.status(200).json({ appointment: appointments });
+        } else {
+            return res.status(430).json({ null_data: "No such doctor found" });
+        }
+    } catch (err) {
+        console.log(err);
+        return res.status(500).json({ error: err });
+    }
+};

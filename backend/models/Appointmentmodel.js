@@ -1,4 +1,4 @@
-import mongoose from "mongoose";
+var mongoose = require("mongoose");
 
 // Define a schema for the appointment data
 const appointmentSchema = new mongoose.Schema({
@@ -16,4 +16,5 @@ const appointmentSchema = new mongoose.Schema({
 }
 );
 
-export default mongoose.model("Appointment", appointmentSchema)
+module.exports = new mongoose.model("Appointment", appointmentSchema)
+
