@@ -323,24 +323,24 @@ exports.UpdateDoctors=[
     console.log('this is received', req.body);
 
     try {
-        const { name, address, doc_list } = req.body;
+        const doc_list=req.body.doc_list;
         const hospital=await Hospital.findOne({
-            name: name, address 
+            name: req.body.org_name, address :req.body.org_address
         })  
       
       if (hospital) {
 
-        const Doctorstoupdate =hospital.Hospitaldr.find(m=>m.Name ===doc_list[0].oldname,m.Department===doc_list[0].olddep )
+        const Doctorstoupdate =hospital.Hospitaldr.filter(m=>{m.Name ===doc_list.oldname,m.Department===doc_list.olddep} )
 
         if(Doctorstoupdate){
-            Medicinestoupdate.Name=doc_list[0].name;
-            Medicinestoupdate.email=doc_list[0].email;
-            Medicinestoupdate.Education=doc_list[0].education;
-            Medicinestoupdate.Speciality=doc_list[0].speciality;
-            Medicinestoupdate.Experience=doc_list[0].experience;
-            Medicinestoupdate.Department=doc_list[0].department;
-            Medicinestoupdate.availability=doc_list[0].availability;
-            Medicinestoupdate.fee=doc_list[0].fee;
+            Doctorstoupdate.Name=doc_list.name;
+            Doctorstoupdate.email=doc_list.email;
+            Doctorstoupdate.Education=doc_list.education;
+            Doctorstoupdate.Speciality=doc_list.speciality;
+            Doctorstoupdate.Experience=doc_list.experience;
+            Doctorstoupdate.Department=doc_list.department;
+            Doctorstoupdate.availability=doc_list.availability.filter(a=>{a.time!=''||a.time!=null});
+            Doctorstoupdate.fee=doc_list.fee;
 
             await hospital.save();
             console.log("Doctor updated successfully");
@@ -525,40 +525,51 @@ exports.deleteDepartment = [
 exports.updateDepartment=[
 	async(req, res) => {
     console.log('this is recieve',req.body)
-    try{
-		var department=new HospitalDepartment({
+    try{var department;
+        if((req.body.depinfo.changepw !== 0)){
+		 department={
                             org_name:req.body.org_name,
 	                        org_address:req.body.org_address,
 	                        name:req.body.depinfo.name,
                             admin_name:req.body.depinfo.admin_name,
-	                        password:(req.body.depinfo.changepw!=0)?req.body.depinfo.password:HospitalDepartment.findOne(
-                                {org_name:req.body.org_name , org_address:req.body.org_address,name:req.body.old_name}
-                                ).password,
+	                        password:req.body.depinfo.password,
 	                        phone:req.body.depinfo.phone,
 	
-        })
-        HospitalDepartment.findOneAndUpdate(
-				{org_name:req.body.org_name , org_address:req.body.org_address,name:req.body.old_name},
-				department
-				).then(()=>{
-                    const H = Hospital.findOne({name:org_name,address:org_address}).then(()=>{
-                        if(H){
-                        const docs=H.Hospitaldr
-                            if(docs){
-                                for(var i=0;i<docs.length;i++){
-                                    if(docs[i].Department===req.body.old_name){
-                                        docs[i].Department=req.body.depinfo.name;
-                                    }
-                                }
                             }
-                        H.save()
-                        return res.status(200).send({department:department});
                         }
+        else{
+            department={
+                org_name:req.body.org_name,
+                org_address:req.body.org_address,
+                name:req.body.depinfo.name,
+                admin_name:req.body.depinfo.admin_name,
+                
+                phone:req.body.depinfo.phone,
 
-                    })
-                    
-                }    
-            )
+                }
+            }
+        
+            Hospital.findOne({ name: req.body.org_name, address: req.body.org_address }).then((hospital) => {
+                if (hospital) {
+                    const docs = hospital.Hospitaldr;
+                    if (docs) {
+                        for (var i = 0; i < docs.length; i++) {
+                            if (docs[i].Department === req.body.old_name) {
+                                docs[i].Department = req.body.depinfo.name;
+                            }
+                        }
+                    }
+            
+                    // Create a new document based on the Hospital model
+                    const newHospitalInstance = new Hospital(hospital);
+            
+                    // Save the modified hospital instance
+                    newHospitalInstance.save().then(() => {
+                        return res.status(200).send({ department: department });
+                    }).catch((error) => {
+                        console.log(error);
+                        return res.status(500).send({ error: "Error saving hospital" });
+                    })}})
     }
     catch(err){
         console.log(err);
