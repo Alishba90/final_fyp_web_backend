@@ -1,6 +1,6 @@
 const Doctor=require('../models/DoctorModel')
 const apiResponse = require("../helpers/apiResponse");
-const Note=require('../models/NoteModel');
+
 const Appointment=require('../models/Appointmentmodel')
 const bcrypt = require('bcrypt');
 // Doctor Schema
@@ -96,14 +96,11 @@ exports.UpdateDoctor = [
 				{Name:req.body.old_name , Email:req.body.old_email},
 				doctor
 				).then(()=>{
-                if(req.body.doctorinfo.name!=req.body.old_name||req.body.email!=req.body.old_email){
-                    Note.updateMany({org_name:req.body.old_name,org_address:req.body.old_email},
-                    {org_name:req.body.doctorinfo.name,org_address:req.body.doctorinfo.address})
-                }
-                console.log('i am here')
+
+                
                     var doc=Doctor.find({Name:req.body.doctorinfo.name,Email:req.body.doctorinfo.email})
 
-console.log('the doctor updated and send',doc)
+                    console.log('the doctor updated and send',doc)
                     return res.status(200).send({doctor:doc});
                 }    
             )

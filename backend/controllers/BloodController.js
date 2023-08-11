@@ -1,6 +1,6 @@
 const Blood = require("../models/BloodModel");
 const bcrypt = require('bcrypt');
-const Note=require('../models/NoteModel');
+
 const Transaction = require("../models/TransactionModel");
 
 // Blood Bank Schema
@@ -11,9 +11,11 @@ function BloodData(data) {
     this.latitude=data.latitude;
 	this.address =data.address;
 	this.email=data.email;
+    this.coordinates=data.coordinates;
 	this.password =data.password;
 	this.phone=data.phone;
 	this.city =data.city;
+    this.coordinates=data.coordinates;
 	this.time=data.time;
 	this.BloodGroup=data.BloodGroup
 }
@@ -63,6 +65,7 @@ exports.AddBloodBank = [
                     return res.status(430).send({error:"This Blood Bank already exist"});
                 }
                 else{
+                    
                     var blood=new Blood({
                         name:req.body.name,
                         longitude:req.body.longitude,
@@ -72,6 +75,7 @@ exports.AddBloodBank = [
 	                    password :req.body.password,
 	                    phone:req.body.phone,
 	                    city:req.body.city,
+                        coordinates:{type:'Point',coordinates:[req.body.longitude,req.body.latitude]},
 	                    time:settime(req.body.time.open,req.body.time.close)
 
                     })
@@ -110,8 +114,7 @@ exports.UpdateBloodBank = [
                 
                 
                 if(req.body.bloodbankinfo.name!=req.body.old_name||req.body.bloodbankinfo.address!=req.body.old_address){
-                    Note.updateMany({org_name:req.body.old_name,org_address:req.body.old_address},
-                    {org_name:req.body.bloodbankinfo.name,org_address:req.body.bloodbankinfo.address})
+                 
 
 
 

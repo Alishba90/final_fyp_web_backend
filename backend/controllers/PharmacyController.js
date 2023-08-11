@@ -1,5 +1,4 @@
 const Pharmacy = require("../models/PharmacyModel.js");
-const Note=require('../models/NoteModel');
 const Order = require("../models/OrderModel");
 const bcrypt = require('bcrypt');
 const Transaction=require('../models/TransactionModel.js')
@@ -7,6 +6,7 @@ const Transaction=require('../models/TransactionModel.js')
 function PharmacyData(data) {
     
     this.pharmacyname =data.pharmacyname;
+    this.coordinates=data.coordinates;
 	this.address =data.address;
 	this.email=data.email;
 	this.password =data.password;
@@ -193,8 +193,8 @@ exports.AddPharmacy = [
                             latitude:req.body.latitude,
 	                        phone:req.body.phone,
 	                        city:req.body.city,
-	                        time:settime(req.body.time.open,req.body.time.close)
-	            
+	                        time:settime(req.body.time.open,req.body.time.close),
+                            coordinates:{type:'Point',coordinates:[req.body.longitude,req.body.latitude]},
                             }    
                         )
 
@@ -237,10 +237,7 @@ exports.UpdatePharmacy = [
         }
 
         if (req.body.pharmacyinfo.name !== req.body.old_name || req.body.pharmacyinfo.address !== req.body.old_address) {
-          Note.updateMany(
-            { org_name: req.body.old_name, org_address: req.body.old_address },
-            { org_name: req.body.pharmacyinfo.pharmacyname, org_address: req.body.pharmacyinfo.address }
-          );
+          
 
           Order.updateMany(
             { org_name: req.body.old_name, org_address: req.body.old_address },

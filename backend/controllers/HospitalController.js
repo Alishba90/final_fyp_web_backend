@@ -2,12 +2,11 @@ const Hospital = require("../models/HospitalModel");
 const apiResponse = require("../helpers/apiResponse");
 const HospitalDepartment=require("../models/DepartmentModel");
 const bcrypt = require('bcrypt');
-const Note= require('../models/NoteModel');
 const Form=require('../models/NCRformsModel');
 
 // Hospital Schema
 function HospitalData(data) {
-    
+    this.coordinates=data.coordinates;
     this.name =data.name;
 	this.address =data.address;
 	this.email=data.email;
@@ -73,6 +72,7 @@ exports.AddHospital = [
                             latitude:req.body.latitude,
 	                        password:req.body.password,
 	                        phone:req.body.phone,
+                            coordinates:{type:'Point',coordinates:[req.body.longitude,req.body.latitude]},
 	                        time:settime(req.body.time.open,req.body.time.close)
 	
                 })
@@ -109,9 +109,7 @@ exports.UpdateHospital = [
 				).then(()=>{
                 
                 if(req.body.hospitalinfo.name!=req.body.old_name||req.body.hospitalinfo.address!=req.body.old_address){
-                    Note.updateMany({org_name:req.body.old_name,org_address:req.body.old_address},
-                    {org_name:req.body.hospitalinfo.name,org_address:req.body.hospitalinfo.address})
-
+                    
                     HospitalDepartment.updateMany({org_name:req.body.old_name,org_address:req.body.old_address},
                     {org_name:req.body.hospitalinfo.name,org_address:req.body.hospitalinfo.address})
 
