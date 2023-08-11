@@ -184,7 +184,6 @@ exports.DoctorSchedule = [
                        
                     var doctor=new DoctorData(dr)
                     var schedule=doctor.Hospitals
-                    
                     console.log(schedule)
                     return res.status(200).send({schedule:schedule});
                 }
@@ -192,20 +191,21 @@ exports.DoctorSchedule = [
                     return res.status(430).send({ null_data:"No such doctor found"});
                 }    
             })
+
     }
     catch(err){
         console.log(err);
         return res.status(430).send({ error: err});
     }
     }
-];
+]
 
 //get schedule for edit
 exports.DoctorScheduleEdit = [
-	(req, res) => {
+	async (req, res) => {
     console.log('this is recieve jsddddddddddddddddddddddddddddddddddddddd',req.params)
     try{
-        Doctor.findOne({Name:req.params.name , Email:req.params.email}).then(dr=>{
+        await Doctor.findOne({Name:req.params.name , Email:req.params.email}).then(dr=>{
                 if(dr){
                        
                     var doctor=new DoctorData(dr)
@@ -223,7 +223,7 @@ exports.DoctorScheduleEdit = [
         console.log(err);
         return res.status(430).send({ error: err});
     }
-    }];
+    }]
 
 
 exports.DoctorAppointments = async (req, res) => {

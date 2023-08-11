@@ -360,6 +360,31 @@ exports.UpdateDoctors=[
 
 //function to get departments
 exports.GetDepartments=[
+    async (req, res) => {
+      console.log('this is received', req.body);
+  
+      try {
+          HospitalDepartment.find({org_name:req.params.org_name,org_address:req.params.org_address}).then(dep=>{
+              if(dep.length){
+                  var department=dep;
+                  
+                  return res.status(200).send({department:department})
+              }
+              else{
+                  return res.status(430).send({ error:"No such department found"});
+              }
+          }
+          )
+        } 
+      catch (err) {
+        console.log(err);
+        return res.status(430).send({ error: err });
+      }
+    }
+  ]
+
+//function to get departments
+exports.GetDepartments=[
   async (req, res) => {
     console.log('this is received', req.body);
 
@@ -367,6 +392,7 @@ exports.GetDepartments=[
         HospitalDepartment.find({org_name:req.params.org_name,org_address:req.params.org_address}).then(dep=>{
             if(dep.length){
                 var department=dep;
+                Hospital.find({nam:req.params.org_name,address:req.params.address})
                 return res.status(200).send({department:department})
             }
             else{
@@ -596,7 +622,7 @@ exports.saveNCRforms=[
 	 (req, res) => {
     console.log('this is recieve',req.body)
     try{
-        Form.findOne({org_name:req.body.org_name,org_address:req.body.org_address,form_no:req.body.form_no}).then((f) => {
+        Form.findOne({org_name:req.body.org_name,org_address:req.body.org_address,form_no:req.body.depinfo.form_no}).then((f) => {
         if(f){
             console.log("A form already exist with this number");
             return res.status(430).send({ error: "A form already exist with this number." });
