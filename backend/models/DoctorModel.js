@@ -4,6 +4,20 @@ const bcrypt = require('bcrypt');
 const ClinicSchema = new mongoose.Schema({
     name: {type: String, required: true},
     address: {type: String, required: true},
+    longitude:{type: String, required: true},
+    latitude:{type: String, required: true},
+    coordinates: {
+      // Add the coordinates field for geospatial indexing
+      type: {
+        type: String,
+        enum: ["Point"],
+        default: "Point",
+      },
+      coordinates: {
+        type: [Number], // [longitude, latitude]
+        index: "2dsphere", // Create a 2dsphere index for geospatial queries
+      }
+    },
     fee:{type: Number, required:true},
     // type:{ type: String, enum:['hospital','clinic']},
     availability: [

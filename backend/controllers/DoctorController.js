@@ -112,6 +112,29 @@ exports.UpdateDoctor = [
     }
 ];
 
+//Update doctor schedule
+exports.UpdateDoctorSchedule = [
+
+	(req, res) => {
+    console.log('this is recieve',req.body)
+    try{
+        
+        Doctor.findOneAndUpdate(
+				{Name:req.body.name , Email:req.body.email},
+				{Hospitals:req.body.schedule}
+				).then(()=>{
+
+                    return res.status(200).send({message:"Successfully updated doctor"});
+                }    
+            )
+    }
+    catch(err){
+        console.log(err);
+        return res.status(430).send({ error: err});
+    }
+    }
+];
+
 //Delete doctor
 exports.DeleteDoctor = [
 
@@ -200,14 +223,14 @@ exports.DoctorSchedule = [
 //get schedule for edit
 exports.DoctorScheduleEdit = [
 	async (req, res) => {
-    console.log('this is recieve jsddddddddddddddddddddddddddddddddddddddd',req.params)
+    console.log('this is recieved',req.params)
     try{
         await Doctor.findOne({Name:req.params.name , Email:req.params.email}).then(dr=>{
                 if(dr){
                        
                     var doctor=new DoctorData(dr)
                     var schedule=doctor.Hospitals
-                    console.log('mmmmmmmmmmmmmmm',schedule)
+                    
                     
                     return res.status(200).send({schedule:schedule});
                 }

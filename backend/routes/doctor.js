@@ -9,6 +9,7 @@ router.get("/getschedule/:name/:email", DoctorController.DoctorSchedule);
 router.get("/getscheduleedit/:name/:email", DoctorController.DoctorScheduleEdit);
 router.get("/getappointments/:name/:email", DoctorController.DoctorAppointments);
 router.post("/update", DoctorController.UpdateDoctor);
+router.post("/updateschedule", DoctorController.UpdateDoctorSchedule);
 router.post("/login", DoctorController.LoginDoctor);
 router.delete("/del/:name/:address", DoctorController.DeleteDoctor);
 
