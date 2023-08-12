@@ -263,9 +263,9 @@ exports.addDoctor = [
 
             var schedulearray=[]
             var s=doc.availability
-            for(var i=0;i<s.length;i++){
-              if(s[i].time.trim().length>0){
-                schedulearray.push({day:s[i].day,time:s[i].time})
+            for(var j=0;j<s.length;j++){
+              if(s[j].time.trim().length>0){
+                schedulearray.push({day:s[j].day,time:s[j].time})
               }
             }
             hospital.Hospitaldr.push({
