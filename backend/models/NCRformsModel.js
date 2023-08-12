@@ -11,7 +11,7 @@ const NCRformsSchema = new mongoose.Schema({
   },
   form_description: {
     type: String,
-    required: true,
+    
   },
   form_department: {
     type: String,
@@ -39,15 +39,15 @@ const NCRformsSchema = new mongoose.Schema({
   },
     resolution_description:{
     type: String,
-    required: true,
+    
   },
     resolver_name:{
     type: String,
-    required: true,
+    
   },
     resolution_date:{
     type: String,
-    required: true,
+    
   },
 },    { timestamps: true },
 //collection name  

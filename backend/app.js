@@ -48,6 +48,16 @@ app.use(cors());
 //Route Prefixes
 app.use("/api/",apiRouter)
 
-app.listen(process.env.PORT || 5000,()=>{
+server.listen(process.env.PORT || 5000,()=>{
 	console.log("server working fine!");
 	})
+
+// Handle socket connections
+io.on('connection', socket => {
+    console.log('A client connected');
+  
+    // Handle disconnections
+    socket.on('disconnect', () => {
+      console.log('A client disconnected');
+    });
+  });

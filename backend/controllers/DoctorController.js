@@ -117,17 +117,57 @@ exports.UpdateDoctor = [
 exports.UpdateDoctorSchedule = [
 
 	(req, res) => {
-    console.log('this is recieve',req.body)
+
+
     try{
         
+        var element=[]
+        var s=req.body.schedule
+        for(var i=0;i<s.length;i++){
+            var availabilityarray=[]
+            for(var j=0;j<s[i].availability.length;j++){
+                var timeslot=[]
+                for(var y=0;y<s[i].availability[j].time.length;y++){
+                    if(s[i].availability[j].time[y].trim().length>0){
+                        
+                        timeslot.push(s[i].availability[j].time[y])
+                    }
+                }
+                
+                if(timeslot.length>0){
+                    availabilityarray.push({day:s[i].availability[j].day,time:timeslot})
+                }
+                console.log(availabilityarray)
+            }
+            
+            if(availabilityarray!=[]){
+                var longitude=0;var latitude=0;
+                if (s[i].longitude !== '' && s[i].latitude !== '' &&
+                !isNaN(parseFloat(s[i].longitude)) && !isNaN(parseFloat(s[i].latitude))) {
+                    longitude=parseFloat(s[i].longitude)
+                    latitude=parseFloat(s[i].longitude)
+                }    
+                element.push({
+                    name:(s[i].name!='')?s[i].name:'Unnamed',
+                    address:s[i].address,
+                    longitude:s[i].longitude,
+                    latitude:s[i].latitude,
+                    coordinates:{type:'Point',coordinates:[longitude,latitude]},
+                    fee:s[i].fee!=''?s[i].fee:0,
+                    availability:availabilityarray})
+            }
+        }
+        
+     
         Doctor.findOneAndUpdate(
 				{Name:req.body.name , Email:req.body.email},
-				{Hospitals:req.body.schedule}
+				{Hospitals:element}
 				).then(()=>{
 
                     return res.status(200).send({message:"Successfully updated doctor"});
                 }    
             )
+        
     }
     catch(err){
         console.log(err);
@@ -281,6 +321,7 @@ exports.DoctorChart=[
         }
     }
 ]
+
 exports.DoctorChart=[
     (req, res) => {
      

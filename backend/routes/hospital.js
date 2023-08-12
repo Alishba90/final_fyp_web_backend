@@ -21,6 +21,7 @@ router.post("/deldoc", HospitalController.DeleteDoctors);
 //for all department related operations
 router.get("/getdeptdetail/:org_name/:org_address", HospitalController.GetDepartments);
 router.get("/getdeptdetail/:org_name/:org_address/:department", HospitalController.departmentDoctors);
+router.get("/getpatients/:org_name/:org_address/:department", HospitalController.departmentAppointments);
 router.post("/logindep", HospitalController.LoginDepartment);
 router.post("/adddep", HospitalController.AddDepartment);
 router.post("/updatedep", HospitalController.updateDepartment);

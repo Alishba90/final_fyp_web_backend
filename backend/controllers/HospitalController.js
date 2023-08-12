@@ -609,6 +609,31 @@ exports.departmentDoctors=[
     }
 ]
 
+//function to get department doctors
+exports.departmentAppointments=[
+  async (req,res)=>{
+      console.log('this is recieved ',req.params)
+      try{
+          await Hospital.findOne({name:req.params.org_name , address:req.params.org_address}).then(hos=>{
+
+                  if(hos){
+                          
+                      var doctors=hos.Hospitaldr.find({Department:req.params.department});
+
+                      return res.status(200).send({ doctors:doctors});
+                  }
+                  else{
+
+                      return res.status(430).send({ error:"No such department found"});
+                  }    
+              })
+      }
+      catch(err){
+          console.log(err)
+      }
+  }
+]
+
 //function to retrieve all NCR forms
 exports.GetNCRforms=[
   async (req, res) => {
