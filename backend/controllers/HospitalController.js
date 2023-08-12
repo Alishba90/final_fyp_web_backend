@@ -698,3 +698,15 @@ exports.resolveNCRforms=[
     }
     }
 ]
+
+exports.HospitalChart=[
+    (req, res) => {
+     
+        try {
+        }
+        catch(err){
+            console.log(err)
+            return res.status(430).json({ error: err });
+        }
+    }
+]

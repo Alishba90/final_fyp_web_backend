@@ -342,3 +342,15 @@ exports.LoginPharmacy=[
         }
     }
 ]
+
+exports.PharmacyChart=[
+    (req, res) => {
+     
+        try {
+        }
+        catch(err){
+            console.log(err)
+            return res.status(430).json({ error: err });
+        }
+    }
+]

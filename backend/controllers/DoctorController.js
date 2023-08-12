@@ -240,3 +240,15 @@ exports.DoctorAppointments = async (req, res) => {
         return res.status(500).json({ error: err });
     }
 };
+
+exports.DoctorChart=[
+    (req, res) => {
+     
+        try {
+        }
+        catch(err){
+            console.log(err)
+            return res.status(430).json({ error: err });
+        }
+    }
+]
