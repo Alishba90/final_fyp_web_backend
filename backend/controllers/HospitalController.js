@@ -90,45 +90,49 @@ exports.AddHospital = [
 
 //Update hospital 
 exports.UpdateHospital = [
-
-	(req, res) => {
-    console.log('this is recieve',req.body)
-    try{
-		var hospital=new Hospital({
-                            name:req.body.name,
-	                        address:req.body.address,
-	                        email:req.body.email,
-	                        password:req.body.password,
-	                        phone:req.body.phone,
-	                        time:settime(req.body.time.open,req.body.time.close)
-	
-        })
+    (req, res) => {
+      console.log('Received update request:', req.body);
+      try {
+        var hospital = {
+          name: req.body.hospitalinfo.name,
+          address: req.body.hospitalinfo.address,
+          email: req.body.hospitalinfo.email,
+          password: req.body.hospitalinfo.password,
+          phone: req.body.hospitalinfo.phone,
+          time: settime(req.body.hospitalinfo.time.open, req.body.hospitalinfo.time.close)
+        };
+  
         Hospital.findOneAndUpdate(
-				{name:req.body.old_name , address:req.body.old_address},
-				hospital
-				).then(()=>{
-                
-                if(req.body.hospitalinfo.name!=req.body.old_name||req.body.hospitalinfo.address!=req.body.old_address){
-                    
-                    HospitalDepartment.updateMany({org_name:req.body.old_name,org_address:req.body.old_address},
-                    {org_name:req.body.hospitalinfo.name,org_address:req.body.hospitalinfo.address})
-
-                }
-
-                    console.log('i am here')
-                    var h=Hospital.find({Name:req.body.hospitalinfo.name,Email:req.body.hospitalinfo.email})
-
-                    console.log('the hospital updated and send',h)
-                    return res.status(200).send({hospital:h});
-                }    
-            )
-    }
-    catch(err){
+          { name: req.body.old_name, address: req.body.old_address },
+          hospital,
+          { new: true, omitUndefined: true } // Add options to return the updated document and omit undefined fields
+        ).then(updatedHospital => {
+          if (!updatedHospital) {
+            return res.status(404).send({ error: 'Hospital not found' });
+          }
+  
+          if (req.body.hospitalinfo.name !== req.body.old_name || req.body.hospitalinfo.address !== req.body.old_address) {
+            Note.updateMany(
+              { org_name: req.body.old_name, org_address: req.body.old_address },
+              { org_name: req.body.hospitalinfo.name, org_address: req.body.hospitalinfo.address }
+            );
+  
+            HospitalDepartment.updateMany(
+              { org_name: req.body.old_name, org_address: req.body.old_address },
+              { org_name: req.body.hospitalinfo.name, org_address: req.body.hospitalinfo.address }
+            );
+          }
+  
+          console.log('The hospital updated and send', updatedHospital);
+          return res.status(200).send({ hospital: updatedHospital });
+        });
+      } catch (err) {
         console.log(err);
-        return res.status(430).send({ error: err});
+        return res.status(430).send({ error: err });
+      }
     }
-    }
-];
+  ];
+  
 
 //Delete hospital
 exports.DeleteHospital = [

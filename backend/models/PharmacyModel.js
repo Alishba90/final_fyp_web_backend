@@ -28,7 +28,7 @@ const PharmacySchema = new mongoose.Schema({
     },
     city: {
         type: String,
-        required: true
+        
     },
     time: {
         type: String,
