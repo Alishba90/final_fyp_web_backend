@@ -23,23 +23,21 @@ function DoctorData(data) {
 exports.DoctorDetail = [
 
 	async (req, res) => {
-    console.log('this is recieve',req.body)
+    console.log('this is recieveeddddddd',req.body)
     try{
-        await Doctor.findOne({Name:req.params.name , Email:req.params.email}).then(dr=>{
-                if(dr){
-                        
-                    var doctor=new DoctorData(dr[0])
+        const { name, email } = req.params;
 
-                    return res.status(200).send({org:doctor});
-                }
-                else{
-                    return res.status(430).send({ null_data:"No such doctor found"});
-                }    
-            })
+        const doctor = await Doctor.findOne({ Name: name, Email: email });
+    
+        if (doctor) {
+          return res.status(200).json({ doctor });
+        } else {
+          return res.status(404).json({ error: 'Doctor not found' });
+        }
     }
     catch(err){
-        console.log(err);
-        return res.status(430).send({ error: err});
+        console.error(err);
+    return res.status(500).json({ error: 'Internal server error' });
     }
     }
 ];
@@ -76,45 +74,58 @@ exports.AddDoctor = [
     }
     }
 ];
-
-//Update doctor
 exports.UpdateDoctor = [
-
-	(req, res) => {
-    console.log('this is recieve',req.body)
-    try{
-		var doctor=new Doctor({
-                Name:req.body.doctorinfo.name,
-                Education:req.body.doctorinfo.education,
-                Speciality:req.body.doctorinfo.speciality,
-                Experience:req.body.doctorinfo.experience,
-                Email:req.body.doctorinfo.email,
-                Phone:req.body.doctorinfo.phone,
-                password:req.body.doctorinfo.password,
-            })
+    (req, res) => {
+      console.log('Received update request:', req.body);
+      try {
+        const updateFields = {
+          Name: req.body.doctorinfo.Name,
+          Education: req.body.doctorinfo.Education,
+          Speciality: req.body.doctorinfo.Speciality,
+          Experience: req.body.doctorinfo.Experience,
+          Email: req.body.doctorinfo.Email,
+          Phone: req.body.doctorinfo.Phone,
+          password: req.body.doctorinfo.password,
+          Hospitals: req.body.doctorinfo.Hospitals, // Add updated hospitals here
+        };
+  
+        console.log('Updating doctor with:', updateFields);
+  
         Doctor.findOneAndUpdate(
-				{Name:req.body.old_name , Email:req.body.old_email},
-				doctor
-				).then(()=>{
-                if(req.body.doctorinfo.name!=req.body.old_name||req.body.email!=req.body.old_email){
-                    Note.updateMany({org_name:req.body.old_name,org_address:req.body.old_email},
-                    {org_name:req.body.doctorinfo.name,org_address:req.body.doctorinfo.address})
-                }
-                console.log('i am here')
-                    var doc=Doctor.find({Name:req.body.doctorinfo.name,Email:req.body.doctorinfo.email})
-
-console.log('the doctor updated and send',doc)
-                    return res.status(200).send({doctor:doc});
-                }    
+          { Name: req.body.old_name, Email: req.body.old_email },
+          updateFields,
+          { new: true } // This option returns the updated document
+        )
+        .then((updatedDoctor) => {
+          console.log('Updated Doctor:', updatedDoctor);
+  
+          if (
+            req.body.doctorinfo.Name !== req.body.old_Name ||
+            req.body.doctorinfo.Email !== req.body.old_Email
+          ) {
+            Note.updateMany(
+              { org_name: req.body.old_name, org_address: req.body.old_email },
+              { org_name: req.body.doctorinfo.Name, org_address: req.body.doctorinfo.address }
             )
-    }
-    catch(err){
+            .then(() => {
+              console.log('Updated Notes');
+            });
+          }
+  
+          return res.status(200).send({ doctor: updatedDoctor });
+        })
+        .catch((err) => {
+          console.log(err);
+          return res.status(430).send({ error: err });
+        });
+      } catch (err) {
         console.log(err);
-        return res.status(430).send({ error: err});
+        return res.status(430).send({ error: err });
+      }
     }
-    }
-];
-
+  ];
+  
+  
 //Delete doctor
 exports.DeleteDoctor = [
 
@@ -229,7 +240,10 @@ exports.DoctorScheduleEdit = [
 exports.DoctorAppointments = async (req, res) => {
     console.log('this is receive app', req.params);
     try {
-        /*const dr = await Doctor.findOne({ Name: req.params.name, Email: req.params.email });*/
+        const { name, email } = req.params;
+
+        // const doctor = await Doctor.findOne({ Name: name, Email: email });
+        // /*const dr = await Doctor.findOne({ Name: req.params.name, Email: req.params.email });*/
         const dr = await Doctor.findOne({ Name: 'Dr Zainabb', Email: 'SHAEENkhan90@gmail.com' });
         if (dr) {
             const appointments = await Appointment.find({ doctorId: dr._id }).exec();

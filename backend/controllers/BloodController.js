@@ -3,7 +3,6 @@ const bcrypt = require('bcrypt');
 const Note=require('../models/NoteModel');
 const Transaction = require("../models/TransactionModel");
 
-// Blood Bank Schema
 function BloodData(data) {
     
     this.name =data.name;
