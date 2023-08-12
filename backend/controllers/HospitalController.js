@@ -261,6 +261,13 @@ exports.addDoctor = [
         for (let i = 0; i < docList.length; i++) {
             const doc = docList[i];
 
+            var schedulearray=[]
+            var s=doc.availability
+            for(var i=0;i<s.length;i++){
+              if(s[i].time.trim().length>0){
+                schedulearray.push({day:s[i].day,time:s[i].time})
+              }
+            }
             hospital.Hospitaldr.push({
                 Name: doc.name,
                 email:doc.email,
@@ -268,7 +275,7 @@ exports.addDoctor = [
                 Speciality:doc.speciality,
                 Experience:doc.experience,
                 Department:doc.department,
-                availability:doc.availability,
+                availability:doc.schedulearray,
                 fee:doc.fee
             });
         
