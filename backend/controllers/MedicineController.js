@@ -7,14 +7,14 @@ const Pharmacy = require("../models/PharmacyModel");
 exports.addMedicine = [
 
   async (req, res) => {
-    console.log('this is receive', req.body);
+    
 
     try {
       const pharmacy = await Pharmacy.findOne({
         pharmacyname: req.body.pharmacyname,
         address: req.body.address
       });
-
+      console.log(pharmacy)
       if (pharmacy) {
         const medList = req.body.med_list;
 
@@ -44,6 +44,7 @@ exports.addMedicine = [
         console.log("Medicines added successfully");
         return res.status(200).send({ message: "Medicines added successfully" });
       } else {
+        
         return res.status(430).send({ error: "No such pharmacy exists" });
       }
     } catch (err) {

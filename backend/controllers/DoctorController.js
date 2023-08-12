@@ -1,6 +1,5 @@
 const Doctor=require('../models/DoctorModel')
 const apiResponse = require("../helpers/apiResponse");
-
 const Appointment=require('../models/Appointmentmodel')
 const bcrypt = require('bcrypt');
 // Doctor Schema
@@ -20,6 +19,7 @@ function DoctorData(data) {
 }
 
 //To get Doctor details
+
 exports.DoctorDetail = [
 
 	async (req, res) => {
