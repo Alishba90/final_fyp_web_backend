@@ -275,7 +275,7 @@ exports.addDoctor = [
                 Speciality:doc.speciality,
                 Experience:doc.experience,
                 Department:doc.department,
-                availability:doc.schedulearray,
+                availability:schedulearray,
                 fee:doc.fee
             });
         
