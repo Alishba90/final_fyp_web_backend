@@ -1,6 +1,7 @@
 const Doctor=require('../models/DoctorModel')
 const apiResponse = require("../helpers/apiResponse");
-const Note=require('../models/NoteModel');
+const Note = require('../models/NoteModel'); // Import the Note model
+
 const Appointment=require('../models/Appointmentmodel')
 const bcrypt = require('bcrypt');
 // Doctor Schema
@@ -99,18 +100,7 @@ exports.UpdateDoctor = [
         .then((updatedDoctor) => {
           console.log('Updated Doctor:', updatedDoctor);
   
-          if (
-            req.body.doctorinfo.Name !== req.body.old_Name ||
-            req.body.doctorinfo.Email !== req.body.old_Email
-          ) {
-            Note.updateMany(
-              { org_name: req.body.old_name, org_address: req.body.old_email },
-              { org_name: req.body.doctorinfo.Name, org_address: req.body.doctorinfo.address }
-            )
-            .then(() => {
-              console.log('Updated Notes');
-            });
-          }
+          
   
           return res.status(200).send({ doctor: updatedDoctor });
         })
@@ -124,7 +114,6 @@ exports.UpdateDoctor = [
       }
     }
   ];
-  
   
 //Delete doctor
 exports.DeleteDoctor = [
@@ -214,14 +203,14 @@ exports.DoctorSchedule = [
 //get schedule for edit
 exports.DoctorScheduleEdit = [
 	async (req, res) => {
-    console.log('this is recieve jsddddddddddddddddddddddddddddddddddddddd',req.params)
+    console.log('this is recieved',req.params)
     try{
         await Doctor.findOne({Name:req.params.name , Email:req.params.email}).then(dr=>{
                 if(dr){
                        
                     var doctor=new DoctorData(dr)
                     var schedule=doctor.Hospitals
-                    console.log('mmmmmmmmmmmmmmm',schedule)
+                    
                     
                     return res.status(200).send({schedule:schedule});
                 }
@@ -243,7 +232,7 @@ exports.DoctorAppointments = async (req, res) => {
         const { name, email } = req.params;
 
         // const doctor = await Doctor.findOne({ Name: name, Email: email });
-        // /*const dr = await Doctor.findOne({ Name: req.params.name, Email: req.params.email });*/
+        // /const dr = await Doctor.findOne({ Name: req.params.name, Email: req.params.email });/
         const dr = await Doctor.findOne({ Name: 'Dr Zainabb', Email: 'SHAEENkhan90@gmail.com' });
         if (dr) {
             const appointments = await Appointment.find({ doctorId: dr._id }).exec();
@@ -257,3 +246,15 @@ exports.DoctorAppointments = async (req, res) => {
         return res.status(500).json({ error: err });
     }
 };
+
+exports.DoctorChart=[
+    (req, res) => {
+     
+        try {
+        }
+        catch(err){
+            console.log(err)
+            return res.status(430).json({ error: err });
+        }
+    }
+]
