@@ -1,6 +1,5 @@
 const Doctor=require('../models/DoctorModel')
 const apiResponse = require("../helpers/apiResponse");
-const Note = require('../models/NoteModel'); // Import the Note model
 
 const Appointment=require('../models/Appointmentmodel')
 const bcrypt = require('bcrypt');
@@ -93,28 +92,25 @@ exports.UpdateDoctor = [
         console.log('Updating doctor with:', updateFields);
   
         Doctor.findOneAndUpdate(
-          { Name: req.body.old_name, Email: req.body.old_email },
-          updateFields,
-          { new: true } // This option returns the updated document
-        )
-        .then((updatedDoctor) => {
-          console.log('Updated Doctor:', updatedDoctor);
-  
-          
-  
-          return res.status(200).send({ doctor: updatedDoctor });
-        })
-        .catch((err) => {
-          console.log(err);
-          return res.status(430).send({ error: err });
-        });
-      } catch (err) {
+				{Name:req.body.old_name , Email:req.body.old_email},
+				doctor
+				).then(()=>{
+
+                
+                    var doc=Doctor.find({Name:req.body.doctorinfo.name,Email:req.body.doctorinfo.email})
+
+                    console.log('the doctor updated and send',doc)
+                    return res.status(200).send({doctor:doc});
+                }    
+            )
+    }
+    catch(err){
         console.log(err);
         return res.status(430).send({ error: err });
       }
     }
-  ];
-  
+];
+
 //Delete doctor
 exports.DeleteDoctor = [
 
@@ -204,12 +200,14 @@ exports.DoctorSchedule = [
 exports.DoctorScheduleEdit = [
 	async (req, res) => {
     console.log('this is recieved',req.params)
+    console.log('this is recieved',req.params)
     try{
         await Doctor.findOne({Name:req.params.name , Email:req.params.email}).then(dr=>{
                 if(dr){
                        
                     var doctor=new DoctorData(dr)
                     var schedule=doctor.Hospitals
+                    
                     
                     
                     return res.status(200).send({schedule:schedule});
@@ -247,6 +245,17 @@ exports.DoctorAppointments = async (req, res) => {
     }
 };
 
+exports.DoctorChart=[
+    (req, res) => {
+     
+        try {
+        }
+        catch(err){
+            console.log(err)
+            return res.status(430).json({ error: err });
+        }
+    }
+]
 exports.DoctorChart=[
     (req, res) => {
      

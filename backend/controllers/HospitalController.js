@@ -2,16 +2,17 @@ const Hospital = require("../models/HospitalModel");
 const apiResponse = require("../helpers/apiResponse");
 const HospitalDepartment=require("../models/DepartmentModel");
 const bcrypt = require('bcrypt');
-const Note= require('../models/NoteModel');
 const Form=require('../models/NCRformsModel');
 
 // Hospital Schema
 function HospitalData(data) {
-    
+    this.coordinates=data.coordinates;
     this.name =data.name;
 	this.address =data.address;
 	this.email=data.email;
 	this.password =data.password;
+    this.longitude=data.longitude;
+    this.latitude=data.latitude;
 	this.phone=data.phone;
 	this.time=data.time;
 	this.Hospitaldr=data.Hospitaldr;
@@ -67,8 +68,11 @@ exports.AddHospital = [
                             name:req.body.name,
 	                        address:req.body.address,
 	                        email:req.body.email,
+                            longitude:req.body.longitude,
+                            latitude:req.body.latitude,
 	                        password:req.body.password,
 	                        phone:req.body.phone,
+                            coordinates:{type:'Point',coordinates:[req.body.longitude,req.body.latitude]},
 	                        time:settime(req.body.time.open,req.body.time.close)
 	
                 })
@@ -696,5 +700,17 @@ exports.resolveNCRforms=[
         console.log(err);
         return res.status(430).send({ error: err});
     }
+    }
+]
+
+exports.HospitalChart=[
+    (req, res) => {
+     
+        try {
+        }
+        catch(err){
+            console.log(err)
+            return res.status(430).json({ error: err });
+        }
     }
 ]

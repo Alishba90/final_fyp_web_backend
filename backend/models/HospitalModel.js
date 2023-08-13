@@ -18,6 +18,14 @@ const HospitalSchema = new mongoose.Schema({
     type: String,
   }
  ,
+ longitude: {
+  type: String,
+
+},
+latitude: {
+  type: String,
+
+},
   time:{
     type: String,
   },
@@ -42,7 +50,18 @@ const HospitalSchema = new mongoose.Schema({
       ],
       fee: Number,
     },
-  ],
+  ],coordinates: {
+    // Add the coordinates field for geospatial indexing
+    type: {
+      type: String,
+      enum: ["Point"],
+      default: "Point",
+    },
+    coordinates: {
+      type: [Number], // [longitude, latitude]
+      index: "2dsphere", // Create a 2dsphere index for geospatial queries
+    }
+  }
 }
 ,
 //collection name  

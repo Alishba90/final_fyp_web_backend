@@ -1,16 +1,20 @@
 const Blood = require("../models/BloodModel");
 const bcrypt = require('bcrypt');
-const Note=require('../models/NoteModel');
+
 const Transaction = require("../models/TransactionModel");
 
 function BloodData(data) {
     
     this.name =data.name;
+    this.longitude=data.longitude;
+    this.latitude=data.latitude;
 	this.address =data.address;
 	this.email=data.email;
+    this.coordinates=data.coordinates;
 	this.password =data.password;
 	this.phone=data.phone;
 	this.city =data.city;
+    this.coordinates=data.coordinates;
 	this.time=data.time;
 	this.BloodGroup=data.BloodGroup
 }
@@ -60,13 +64,17 @@ exports.AddBloodBank = [
                     return res.status(430).send({error:"This Blood Bank already exist"});
                 }
                 else{
+                    
                     var blood=new Blood({
                         name:req.body.name,
+                        longitude:req.body.longitude,
+                        latitude:req.body.latitude,
 	                    address:req.body.address,
 	                    email:req.body.email,
 	                    password :req.body.password,
 	                    phone:req.body.phone,
 	                    city:req.body.city,
+                        coordinates:{type:'Point',coordinates:[req.body.longitude,req.body.latitude]},
 	                    time:settime(req.body.time.open,req.body.time.close)
 
                     })
@@ -105,8 +113,7 @@ exports.UpdateBloodBank = [
                 
                 
                 if(req.body.bloodbankinfo.name!=req.body.old_name||req.body.bloodbankinfo.address!=req.body.old_address){
-                    Note.updateMany({org_name:req.body.old_name,org_address:req.body.old_address},
-                    {org_name:req.body.bloodbankinfo.name,org_address:req.body.bloodbankinfo.address})
+                 
 
 
 
@@ -447,3 +454,15 @@ exports.BloodBankStats = [
         }
     }
 ];
+
+exports.BloodBankChart=[
+    (req, res) => {
+     
+        try {
+        }
+        catch(err){
+            console.log(err)
+            return res.status(430).json({ error: err });
+        }
+    }
+]
