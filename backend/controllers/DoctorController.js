@@ -50,7 +50,7 @@ exports.AddDoctor = [
     try{
         Doctor.findOne({Name:req.body.name , Email:req.body.email}).then(dr=>{
                 if(dr){
-                    return res.status(430).send({error:"This Doctor already exist"});
+                    return res.status(430).send({error:"This org already exist"});
                 }
                 else{
                     var doctor=new Doctor({
@@ -64,7 +64,7 @@ exports.AddDoctor = [
                     })
 
 					doctor.save()
-                    return res.status(200).send({message:"Doctor registered successfully"});
+                    return res.status(200).send({user:doctor});
                 }    
             })
     }
@@ -294,13 +294,15 @@ exports.DoctorAppointments = async (req, res) => {
     try {
         const { name, email } = req.params;
 
-        // const doctor = await Doctor.findOne({ Name: name, Email: email });
-        // /const dr = await Doctor.findOne({ Name: req.params.name, Email: req.params.email });/
-        const dr = await Doctor.findOne({ Name: 'Dr Zainabb', Email: 'SHAEENkhan90@gmail.com' });
+        const dr = await Doctor.findOne({ Name: name, Email: email });
+       
+        //const dr = await Doctor.findOne({ Name: 'Dr Zainabb', Email: 'SHAEENkhan90@gmail.com' });
         if (dr) {
             const appointments = await Appointment.find({ doctorId: dr._id }).exec();
             console.log(appointments);
-            return res.status(200).json({ appointment: appointments });
+            return res.status(200).json({ appointment: appointments })
+            // Emit the updated order data to connected clients
+            io.emit('appointmentUpdate', { appointment: appointments});
         } else {
             return res.status(430).json({ null_data: "No such doctor found" });
         }
@@ -310,17 +312,6 @@ exports.DoctorAppointments = async (req, res) => {
     }
 };
 
-exports.DoctorChart=[
-    (req, res) => {
-     
-        try {
-        }
-        catch(err){
-            console.log(err)
-            return res.status(430).json({ error: err });
-        }
-    }
-]
 
 exports.DoctorChart=[
     (req, res) => {

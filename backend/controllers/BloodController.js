@@ -61,7 +61,7 @@ exports.AddBloodBank = [
     try{
         Blood.findOne({name:req.body.name , address:req.body.address}).then(bank=>{
                 if(bank){
-                    return res.status(430).send({error:"This Blood Bank already exist"});
+                    return res.status(430).send({error:"This org already exist"});
                 }
                 else{
                     
@@ -79,7 +79,7 @@ exports.AddBloodBank = [
 
                     })
 					blood.save()
-                    return res.status(200).send({message:"Blood Bank added successfully"});
+                    return res.status(200).send({user:blood});
                 }    
             })
     }
@@ -207,6 +207,7 @@ exports.LoginBloodBank=[
                 if(blood.length){
                     let bb=new BloodData(blood[0])
                     if(compare(bb.password,req.body.password)){
+                    
                         return res.status(200).send({user:bb})
                     }
                     else{

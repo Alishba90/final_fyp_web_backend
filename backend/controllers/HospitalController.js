@@ -61,23 +61,23 @@ exports.AddHospital = [
     try{
         Hospital.findOne({name:req.body.name , address:req.body.address}).then(hos=>{
                 if(hos){
-                    return res.status(430).send({error:"This Hospital already exist"});
+                    return res.status(430).send({error:"This org already exist"});
                 }
                 else{
                     var hospital=new Hospital({
-                            name:req.body.name,
+                          name:req.body.name,
 	                        address:req.body.address,
 	                        email:req.body.email,
-                            longitude:req.body.longitude,
-                            latitude:req.body.latitude,
+                          longitude:req.body.longitude,
+                          latitude:req.body.latitude,
 	                        password:req.body.password,
 	                        phone:req.body.phone,
-                            coordinates:{type:'Point',coordinates:[req.body.longitude,req.body.latitude]},
+                          coordinates:{type:'Point',coordinates:[req.body.longitude,req.body.latitude]},
 	                        time:settime(req.body.time.open,req.body.time.close)
 	
                 })
 					hospital.save()
-                    return res.status(200).send({message:"Hospital added successfully"});
+                    return res.status(200).send({user:hospital});
                 }    
             })
     }

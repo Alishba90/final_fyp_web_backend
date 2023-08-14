@@ -179,7 +179,7 @@ exports.AddPharmacy = [
         Pharmacy.findOne({pharmacyname:req.body.name , address:req.body.address}).then(pharma=>{
                 if(pharma){
                     
-                    return res.status(430).send({error:"This Pharmacy already exist"});
+                    return res.status(430).send({error:"This org already exist"});
                 }
                 else{
                     
@@ -201,7 +201,7 @@ exports.AddPharmacy = [
 
 
 					pharmacy.save()
-                    return res.status(200).send({message:"Pharmacy added successfully"});
+                    return res.status(200).send({user:pharmacy});
                 }    
             })
     }
@@ -213,7 +213,6 @@ exports.AddPharmacy = [
 ];
 
 //update pharmacy
-
 exports.UpdatePharmacy = [
   (req, res) => {
     console.log('this is recieve', req.body);
@@ -259,7 +258,6 @@ exports.UpdatePharmacy = [
     }
   }
 ];
-
 
 //Delete pharmacy 
 exports.DeletePharmacy = [

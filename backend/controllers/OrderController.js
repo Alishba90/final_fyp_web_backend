@@ -10,6 +10,8 @@ exports.allOrders=[
             if(order.length){
                     var order=order;
                 return res.status(200).send({ order:order });
+                // Emit the updated order data to connected clients
+                io.emit('orderUpdate', { order: order });
             }
             else{
                 return res.status(430).send({ null_data:"No orders found"});
