@@ -78,7 +78,11 @@ exports.AddBloodBank = [
 	                    time:settime(req.body.time.open,req.body.time.close)
 
                     })
+                    try{
 					blood.save()
+                    }catch(e){
+                        return res.status(420).send({ error: err});
+                    }
                     return res.status(200).send({user:blood});
                 }    
             })
