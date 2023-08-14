@@ -12,15 +12,15 @@ const DepartmentSchema = new mongoose.Schema({
   },
    password: {
     type: String,
-    required: true,
+    
   },
     admin_name:{
     type: String,
-    required: true,
+    
     },
     phone: {
         type: String,
-        required: true
+      
     },
     name:{
         type: String,

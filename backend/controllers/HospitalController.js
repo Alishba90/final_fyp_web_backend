@@ -257,7 +257,7 @@ exports.addDoctor = [
 
         if (hospital) {
         const docList = req.body.doc_list;
-
+            
         for (let i = 0; i < docList.length; i++) {
             const doc = docList[i];
 
@@ -278,7 +278,15 @@ exports.addDoctor = [
                 availability:schedulearray,
                 fee:doc.fee
             });
-        
+            HospitalDepartment.findOne({name:doc.department,org_name:req.body.org_name,org_address:req.body.org_address}).then(h=>{
+              if(!h){
+                var hosdep=new HospitalDepartment({
+                  name:doc.department,org_name:req.body.org_name,org_address:req.body.org_address,phone:'',admin_name:'',password:''}
+                )
+                hosdep.save()
+              }
+            })
+            
         }
 
         await hospital.save();
@@ -299,7 +307,7 @@ exports.addDoctor = [
 exports.DeleteDoctors=[
 
   async (req, res) => {
-    console.log('hi')
+    
     console.log('this is received', req.body);
 
     try {
