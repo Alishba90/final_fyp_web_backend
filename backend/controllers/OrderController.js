@@ -2,16 +2,16 @@ const Order = require("../models/OrderModel");
 
 
 //function to get all orders
-exports.allOrders=[
-	async (req, res) => {
+exports.allOrders= async(req, res) => 
+	 {
     console.log('this is recieve',req.params.org_name,req.params.org_address)
     try{
-        Order.find({org_name:req.params.org_name,org_address:req.params.org_address}).then(order=>{
-            if(order.length){
-                    var order=order;
-                return res.status(200).send({ order:order });
-                // Emit the updated order data to connected clients
-                io.emit('orderUpdate', { order: order });
+        Order.find({org_name:req.params.org_name,org_address:req.params.org_address}).then(orders=>{
+            if(orders.length){
+                
+                    //io.emit('orderUpdate', { order: orders });
+                return res.status(200).send({ order:orders });
+                
             }
             else{
                 return res.status(430).send({ null_data:"No orders found"});
@@ -24,7 +24,7 @@ exports.allOrders=[
         return res.status(430).send({ error: err});
     }
     }
-]
+
 
 
 /////////////u have to correct it
