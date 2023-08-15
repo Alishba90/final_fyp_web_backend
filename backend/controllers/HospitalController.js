@@ -304,7 +304,7 @@ exports.addDoctor = [
                       org_address: req.body.org_address,
                       phone: '',
                       admin_name: '',
-                      password: ''
+                      password: doc.department
                   });
 
                   // Save the new department object
