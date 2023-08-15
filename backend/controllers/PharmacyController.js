@@ -1,6 +1,7 @@
 const Pharmacy = require("../models/PharmacyModel.js");
 const Order = require("../models/OrderModel");
 const bcrypt = require('bcrypt');
+
 const Transaction=require('../models/TransactionModel.js')
 // Pharmacy Schema
 function PharmacyData(data) {
@@ -341,14 +342,123 @@ exports.LoginPharmacy=[
     }
 ]
 
-exports.PharmacyChart=[
-    (req, res) => {
-     
+exports.PharmacyChart = [
+    async (req, res) => {
         try {
-        }
-        catch(err){
-            console.log(err)
-            return res.status(430).json({ error: err });
+            const pharmacy = await Pharmacy.findOne({
+                pharmacyname: req.params.name,
+                address: req.params.address
+            });
+
+            if (!pharmacy) {
+                return res.status(404).json({ error: 'Pharmacy not found' });
+            }
+
+            const medicineNames = pharmacy.medicine.map(m => m.name);
+
+            const currentDate = new Date();
+            const currentMonth = currentDate.getMonth() + 1; // Months are 0-indexed
+
+            const sales = await Transaction.aggregate([
+                {
+                    $match: {
+                        org_name: pharmacy.pharmacyname,
+                        org_address: pharmacy.address,
+                        date: { $regex: `^\\d{2}/${currentMonth}/\\d{4}` } // Assuming date format is dd/mm/yyyy
+                    }
+                },
+                {
+                    $unwind: '$items'
+                },
+                {
+                    $match: {
+                        'items.name': { $in: medicineNames }
+                    }
+                },
+                {
+                    $group: {
+                        _id: '$items.name',
+                        totalQuantitySold: { $sum: { $toInt: '$items.quantity' } }
+                    }
+                }
+            ]);
+
+            const unitsSoldArray = pharmacy.medicine.map(medicine => {
+                const soldMedicine = sales.find(sale => sale._id === medicine.name);
+                const totalQuantitySold = soldMedicine ? soldMedicine.totalQuantitySold : 0;
+                return {
+                    name: medicine.name,
+                    totalQuantitySold: totalQuantitySold
+                };
+            });
+            med_list=[]
+            quantity=[]
+            unitsSoldArray.forEach(m=>{
+                med_list.push(m.name)
+                quantity.push(m.totalQuantitySold)
+            })
+            console.log(med_list,quantity)
+            return res.status(200).json({medarray:unitsSoldArray});
+        } catch (err) {
+            console.log(err);
+            return res.status(500).json({ error: 'Internal server error' });
         }
     }
-]
+];
+
+
+exports.TodaySold = [
+    async (req, res) => {
+        try {
+            const pharmacy = await Pharmacy.findOne({
+                pharmacyname: req.params.name,
+                address: req.params.address
+            });
+
+            if (!pharmacy) {
+                return res.status(404).json({ error: 'Pharmacy not found' });
+            }
+
+            const today = new Date() // Get current date
+
+            const sales = await Transaction.aggregate([
+                {
+                    $match: {
+                        org_name: pharmacy.pharmacyname,
+                        org_address: pharmacy.address,
+                        date: today.getDate()+'/'+today.getMonth()+'/'+today.getFullYear()
+                    }
+                },
+                {
+                    $unwind: '$items'
+                },
+                {
+                    $group: {
+                        _id: '$items.name',
+                        totalQuantitySold: { $sum: { $toInt: '$items.quantity' } },
+                        totalPrice: { $sum: { $multiply: [{ $toDouble: '$items.quantity' }, { $toDouble: '$items.price' }] } }
+                    }
+                },
+                {
+                    $match: {
+                        totalQuantitySold: { $gt: 0 } // Exclude items with quantity 0
+                    }
+                }
+            ]);
+
+            const medicinesSoldToday = pharmacy.medicine.map(medicine => {
+                const soldMedicine = sales.find(sale => sale._id === medicine.name);
+                return {
+                    name: medicine.name,
+                    totalQuantitySold: soldMedicine ? soldMedicine.totalQuantitySold : 0,
+                    totalPrice: soldMedicine ? soldMedicine.totalPrice : 0
+                };
+            });
+            console.log('the medicines sold today are',medicinesSoldToday)
+            return res.status(200).json({medsold:medicinesSoldToday});
+        } catch (err) {
+            console.log(err);
+            return res.status(500).json({ error: 'Internal server error' });
+        }
+    }
+];

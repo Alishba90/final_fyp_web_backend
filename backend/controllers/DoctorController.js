@@ -23,7 +23,7 @@ function DoctorData(data) {
 exports.DoctorDetail = [
 
 	async (req, res) => {
-    console.log('this is recieveeddddddd',req.body)
+
     try{
         const { name, email } = req.params;
 
@@ -46,7 +46,7 @@ exports.DoctorDetail = [
 exports.AddDoctor = [
 
 	(req, res) => {
-    console.log('this is recieve',req.body)
+
     try{
         Doctor.findOne({Name:req.body.name , Email:req.body.email}).then(dr=>{
                 if(dr){
@@ -78,7 +78,7 @@ exports.AddDoctor = [
 //update doctor information
 exports.UpdateDoctor = [
     (req, res) => {
-      console.log('Received update request:', req.body);
+    
       try {
         const updateFields = {
           Name: req.body.doctorinfo.Name,
@@ -91,7 +91,7 @@ exports.UpdateDoctor = [
           Hospitals: req.body.doctorinfo.Hospitals, // Add updated hospitals here
         };
   
-        console.log('Updating doctor with:', updateFields);
+        
   
         Doctor.findOneAndUpdate(
 				{Name:req.body.old_name , Email:req.body.old_email},
@@ -101,7 +101,7 @@ exports.UpdateDoctor = [
                 
                     var doc=Doctor.find({Name:req.body.doctorinfo.name,Email:req.body.doctorinfo.email})
 
-                    console.log('the doctor updated and send',doc)
+            
                     return res.status(200).send({doctor:doc});
                 }    
             )
@@ -137,7 +137,7 @@ exports.UpdateDoctorSchedule = [
                 if(timeslot.length>0){
                     availabilityarray.push({day:s[i].availability[j].day,time:timeslot})
                 }
-                console.log(availabilityarray)
+                
             }
             
             if(availabilityarray!=[]){
@@ -180,8 +180,7 @@ exports.UpdateDoctorSchedule = [
 exports.DeleteDoctor = [
 
 	(req, res) => {
-    console.log('this is recieve',req.body)
-    try{
+     try{
 		
         Doctor.deleteOne(
 				{Name:req.params.name , Email:req.params.email},
@@ -208,7 +207,7 @@ async function compare(a,b){
 //function to login as a doctor
 exports.LoginDoctor=[
     async (req,res)=>{
-        console.log('this is recieved ',req.body)
+        
         try{
 
             Doctor.find({Email:req.body.email}).then(dr=>{
@@ -238,14 +237,14 @@ exports.LoginDoctor=[
 exports.DoctorSchedule = [
 
 	(req, res) => {
-    console.log('this is recieve',req.params)
+  
     try{
          Doctor.findOne({Name:req.params.name , Email:req.params.email}).then(dr=>{
                 if(dr){
                        
                     var doctor=new DoctorData(dr)
                     var schedule=doctor.Hospitals
-                    console.log(schedule)
+                  
                     return res.status(200).send({schedule:schedule});
                 }
                 else{
@@ -264,8 +263,6 @@ exports.DoctorSchedule = [
 //get schedule for edit
 exports.DoctorScheduleEdit = [
 	async (req, res) => {
-    console.log('this is recieved',req.params)
-    console.log('this is recieved',req.params)
     try{
         await Doctor.findOne({Name:req.params.name , Email:req.params.email}).then(dr=>{
                 if(dr){
@@ -290,7 +287,7 @@ exports.DoctorScheduleEdit = [
 
 
 exports.DoctorAppointments = async (req, res) => {
-    console.log('this is receive app', req.params);
+
     try {
         const { name, email } = req.params;
 
@@ -299,7 +296,7 @@ exports.DoctorAppointments = async (req, res) => {
         //const dr = await Doctor.findOne({ Name: 'Dr Zainabb', Email: 'SHAEENkhan90@gmail.com' });
         if (dr) {
             const appointments = await Appointment.find({ doctorId: dr._id }).exec();
-            console.log(appointments);
+          
             return res.status(200).json({ appointment: appointments })
             // Emit the updated order data to connected clients
             io.emit('appointmentUpdate', { appointment: appointments});
@@ -313,14 +310,3 @@ exports.DoctorAppointments = async (req, res) => {
 };
 
 
-exports.DoctorChart=[
-    (req, res) => {
-     
-        try {
-        }
-        catch(err){
-            console.log(err)
-            return res.status(430).json({ error: err });
-        }
-    }
-]

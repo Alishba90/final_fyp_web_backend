@@ -6,6 +6,8 @@ var router = express.Router();
 
 router.get("/detail/:name/:address", PharmacyController.PharmacyDetail);
 router.get("/stats/:name/:address", PharmacyController.PharmacyStats);
+router.get("/fetchgraphs/:name/:address", PharmacyController.PharmacyChart);
+router.get("/todaymedsold/:name/:address", PharmacyController.TodaySold);
 router.post("/add", PharmacyController.AddPharmacy);
 router.post("/update", PharmacyController.UpdatePharmacy);
 router.get("/branch/:name", PharmacyController.PharmacyBranches);

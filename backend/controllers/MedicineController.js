@@ -57,7 +57,7 @@ exports.addMedicine = [
 //function to delete selected medicines
 exports.deleteSelectedMedicines = [
   async (req, res) => {
-    console.log('this is received', req.params);
+  
 
     try {
       const { name, address, fields } = req.params;
@@ -118,7 +118,7 @@ exports.allMedicines = [
 
 exports.LowMedicines = [
   async (req, res) => {
-    console.log('this is received', req.params);
+
     try {
       const pharmacy = await Pharmacy.findOne({ pharmacyname: req.params.org_name, address: req.params.org_address });
       if (pharmacy) {
@@ -136,7 +136,7 @@ exports.LowMedicines = [
 
 exports.updateMedicines = [
   async (req, res) => {
-    console.log('this is received', req.body);
+
 
     try {
         const { name, address, med_list } = req.body;

@@ -12,6 +12,8 @@ router.post("/update", HospitalController.UpdateHospital);
 router.post("/login", HospitalController.LoginHospital);
 router.get("/branch/:name", HospitalController.HospitalBranches);
 
+
+
 //for all doctors related operations
 router.get("/getdoctors/:org_name/:org_address", HospitalController.HospitalDoctors);
 router.post("/adddoc", HospitalController.addDoctor);

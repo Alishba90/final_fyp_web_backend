@@ -3,6 +3,7 @@ const apiResponse = require("../helpers/apiResponse");
 const HospitalDepartment=require("../models/DepartmentModel");
 const bcrypt = require('bcrypt');
 const Form=require('../models/NCRformsModel');
+const Appointment=require('../models/Appointmentmodel')
 
 // Hospital Schema
 function HospitalData(data) {
@@ -32,7 +33,7 @@ function settime(open,close){
 exports.HospitalDetail = [
 
 	async (req, res) => {
-    console.log('this is recieve',req.body)
+
     try{
         await Hospital.findOne({name:req.params.name , address:req.params.address}).then(hos=>{
                 if(hos){
@@ -57,7 +58,7 @@ exports.HospitalDetail = [
 exports.AddHospital = [
 
 	(req, res) => {
-    console.log('this is recieve',req.body)
+
     try{
         Hospital.findOne({name:req.body.name , address:req.body.address}).then(hos=>{
                 if(hos){
@@ -138,7 +139,7 @@ exports.UpdateHospital = [
 exports.DeleteHospital = [
 
 	(req, res) => {
-    console.log('this is recieve',req.body)
+   
     try{
 		
         Hospital.deleteOne(
@@ -161,7 +162,7 @@ exports.DeleteHospital = [
 exports.HospitalBranches = [
 	
 	async (req, res) => {
-    console.log('this is recieve',req.body)
+
     try{
         Hospital.find({name:req.params.name}).then(hb=>{
             if(hb){
@@ -193,7 +194,7 @@ async function compare(a,b){
 //function to login to a hospital
 exports.LoginHospital=[
     async (req,res)=>{
-        console.log('this is recieved ',req.body)
+       
         try{
             Hospital.find({name:req.body.name,address:req.body.branch}).then(hos=>{
                 if(hos){
@@ -221,15 +222,15 @@ exports.LoginHospital=[
 //function to get all the doctors of the hospital
 exports.HospitalDoctors=[
     async (req,res)=>{
-        console.log('this is recieved ',req.params)
+        
         try{
             await Hospital.findOne({name:req.params.org_name , address:req.params.org_address}).then(hos=>{
 
                     if(hos){
                             
                         var doctors=hos.Hospitaldr;
-
-                        return res.status(200).send({ doctors:doctors});
+                         
+                        return res.status(200).send({doctors:doctors});
                     }
                     else{
 
@@ -246,69 +247,92 @@ exports.HospitalDoctors=[
 
 //function to add doctors 
 exports.addDoctor = [
-    async (req, res) => {
-    console.log('this is receive', req.body);
+  async (req, res) => {
+   
 
-    try {
-        const hospital = await Hospital.findOne({
-        name: req.body.org_name,
-        address: req.body.org_address
-        });
+      try {
+          const hospital = await Hospital.findOne({
+              name: req.body.org_name,
+              address: req.body.org_address
+          });
 
-        if (hospital) {
-        const docList = req.body.doc_list;
-            
-        for (let i = 0; i < docList.length; i++) {
-            const doc = docList[i];
+          if (!hospital) {
+              return res.status(430).send({ error: "No such hospital exists" });
+          }
 
-            var schedulearray=[]
-            var s=doc.availability
-            for(var j=0;j<s.length;j++){
-              if(s[j].time.trim().length>0){
-                schedulearray.push({day:s[j].day,time:s[j].time})
+          const docList = req.body.doc_list;
+          const modifiedDoctorsArray = docList.map(doctor => {
+              if (doctor.department.includes('logist')) {
+                  const modifiedDepartment = doctor.department.replace('logist', 'logy');
+                  return { ...doctor, department: modifiedDepartment };
+              } else {
+                  return doctor;
               }
-            }
-            hospital.Hospitaldr.push({
-                Name: doc.name,
-                email:doc.email,
-                Education:doc.education,
-                Speciality:doc.speciality,
-                Experience:doc.experience,
-                Department:doc.department,
-                availability:schedulearray,
-                fee:doc.fee
-            });
-            HospitalDepartment.findOne({name:doc.department,org_name:req.body.org_name,org_address:req.body.org_address}).then(h=>{
-              if(!h){
-                var hosdep=new HospitalDepartment({
-                  name:doc.department,org_name:req.body.org_name,org_address:req.body.org_address,phone:'',admin_name:'',password:''}
-                )
-                hosdep.save()
+          });    
+
+          // Create a set to keep track of created departments
+          const createdDepartments = new Set();
+
+          for (let i = 0; i < modifiedDoctorsArray.length; i++) {
+              const doc = modifiedDoctorsArray[i];
+
+              var schedulearray = [];
+              var s = doc.availability;
+              for (var j = 0; j < s.length; j++) {
+                  if (s[j].time.trim().length > 0) {
+                      schedulearray.push({ day: s[j].day, time: s[j].time });
+                  }
               }
-            })
-            
-        }
 
-        await hospital.save();
+              hospital.Hospitaldr.push({
+                  Name: doc.name,
+                  email: doc.email,
+                  Education: doc.education,
+                  Speciality: doc.speciality,
+                  Experience: doc.experience,
+                  Department: doc.department,
+                  availability: schedulearray,
+                  fee: doc.fee
+              });
 
-        console.log("Doctors added successfully");
-        return res.status(200).send({ message: "Doctors added successfully" });
-        } else {
-        return res.status(430).send({ error: "No such hospital exists" });
-        }
-    } catch (err) {
-        console.log("db error", err);
-        return res.status(422).send({ error: err });
-    }
-    }
+              // Check if the department has already been created
+              if (!createdDepartments.has(doc.department)) {
+                  // Create a new department object
+                  const newDepartment = new HospitalDepartment({
+                      name: doc.department,
+                      org_name: req.body.org_name,
+                      org_address: req.body.org_address,
+                      phone: '',
+                      admin_name: '',
+                      password: ''
+                  });
+
+                  // Save the new department object
+                  await newDepartment.save();
+
+                  // Add the department to the set of created departments
+                  createdDepartments.add(doc.department);
+              }
+          }
+
+          await hospital.save();
+
+          console.log("Doctors added successfully");
+          return res.status(200).send({ message: "Doctors added successfully" });
+      } catch (err) {
+          console.log("db error", err);
+          return res.status(422).send({ error: err });
+      }
+  }
 ]
+
 
 //function to delete doctors
 exports.DeleteDoctors=[
 
   async (req, res) => {
     
-    console.log('this is received', req.body);
+    
 
     try {
       const { name, address, doc_list } = req.body;
@@ -341,7 +365,7 @@ exports.DeleteDoctors=[
 //function to update doctors
 exports.UpdateDoctors=[
   async (req, res) => {
-    console.log('this is received', req.body);
+    
 
     try {
         const doc_list=req.body.doc_list;
@@ -382,7 +406,7 @@ exports.UpdateDoctors=[
 //function to get departments
 exports.GetDepartments=[
     async (req, res) => {
-      console.log('this is received', req.body);
+
   
       try {
           HospitalDepartment.find({org_name:req.params.org_name,org_address:req.params.org_address}).then(dep=>{
@@ -404,35 +428,11 @@ exports.GetDepartments=[
     }
   ]
 
-//function to get departments
-exports.GetDepartments=[
-  async (req, res) => {
-    console.log('this is received', req.body);
-
-    try {
-        HospitalDepartment.find({org_name:req.params.org_name,org_address:req.params.org_address}).then(dep=>{
-            if(dep.length){
-                var department=dep;
-                Hospital.find({nam:req.params.org_name,address:req.params.address})
-                return res.status(200).send({department:department})
-            }
-            else{
-                return res.status(430).send({ error:"No such department found"});
-            }
-        }
-        )
-      } 
-    catch (err) {
-      console.log(err);
-      return res.status(430).send({ error: err });
-    }
-  }
-]
 
 //function to add departments
 exports.AddDepartment=[
 	 (req, res) => {
-    console.log('this is recieve',req.body)
+
     try{
         HospitalDepartment.findOne({org_name:req.body.org_name,org_address:req.body.org_address,name:req.body.depinfo.name}).then((dept) => {
         if(dept){
@@ -469,7 +469,7 @@ exports.AddDepartment=[
 // function to login into a department
 exports.LoginDepartment = [
   async (req, res) => {
-    console.log('this is received ', req.body);
+
     try {
       HospitalDepartment.find({ org_name: req.body.org_name, org_address: req.body.org_address, name: req.body.name })
         .then(async (dept) => {
@@ -502,7 +502,7 @@ exports.LoginDepartment = [
 
 exports.deleteDepartment = [
   async (req, res) => {
-    console.log('this is receive', req.body);
+    
     try {
       const hospital = await Hospital.findOne({
         name: req.body.org_name,
@@ -545,7 +545,7 @@ exports.deleteDepartment = [
 //function to update department
 exports.updateDepartment=[
 	async(req, res) => {
-    console.log('this is recieve',req.body)
+
     try{var department;
         if((req.body.depinfo.changepw !== 0)){
 		 department={
@@ -602,7 +602,7 @@ exports.updateDepartment=[
 //function to get department doctors
 exports.departmentDoctors=[
     async (req,res)=>{
-        console.log('this is recieved ',req.params)
+ 
         try{
             await Hospital.findOne({name:req.params.org_name , address:req.params.org_address}).then(hos=>{
 
@@ -624,18 +624,29 @@ exports.departmentDoctors=[
     }
 ]
 
-//function to get department doctors
+//function to get department appointment
 exports.departmentAppointments=[
   async (req,res)=>{
-      console.log('this is recieved ',req.params)
+      
       try{
           await Hospital.findOne({name:req.params.org_name , address:req.params.org_address}).then(hos=>{
 
                   if(hos){
-                          
-                      var doctors=hos.Hospitaldr.find({Department:req.params.department});
+                          var drs=[]
+                      Appointment.find({clinicName:hos.name }).then(a=>{
+                        if(a){var hosdr=hos.Hospitaldr
+                          a.forEach(app=>{
+                            if(hosdr.filter(h=>{h.Department===req.params.department,h._id===app.doctorId})){
+                              drs.push(app)
+                            }
+                                
+                            
+                          })
+                          console.log(drs)
+                          return res.status(200).send({ appointments:drs});
+                        }
+                      })
 
-                      return res.status(200).send({ doctors:doctors});
                   }
                   else{
 
@@ -652,7 +663,7 @@ exports.departmentAppointments=[
 //function to retrieve all NCR forms
 exports.GetNCRforms=[
   async (req, res) => {
-    console.log('this is received for form', req.params);
+   
 
     try {
         Form.find({org_name:req.params.org_name,org_address:req.params.org_address}).then(f=>{
@@ -677,7 +688,7 @@ exports.GetNCRforms=[
 //function to store NCR forms
 exports.saveNCRforms=[
 	 (req, res) => {
-    console.log('this is recieve',req.body)
+  
     try{
         Form.findOne({org_name:req.body.org_name,org_address:req.body.org_address,form_no:req.body.depinfo.form_no}).then((f) => {
         if(f){
@@ -719,7 +730,7 @@ exports.saveNCRforms=[
 //function to update NCR forms for resolution
 exports.resolveNCRforms=[
 	 (req, res) => {
-    console.log('this is recieve',req.body)
+   
     try{
         Form.findOne({org_name:req.body.org_name,org_address:req.body.org_address,form_no:req.body.form_no}).then((f) => {
         if(f){
@@ -743,14 +754,5 @@ exports.resolveNCRforms=[
     }
 ]
 
-exports.HospitalChart=[
-    (req, res) => {
-     
-        try {
-        }
-        catch(err){
-            console.log(err)
-            return res.status(430).json({ error: err });
-        }
-    }
-]
+
+

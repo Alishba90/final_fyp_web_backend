@@ -32,7 +32,7 @@ function settime(open,close){
 exports.BloodBankDetail = [
 
 	async (req, res) => {
-    console.log('this is recieve',req.body)
+    
     try{
         await Blood.findOne({name:req.params.name , address:req.params.address}).then(blood=>{
                 if(blood){
@@ -57,7 +57,7 @@ exports.BloodBankDetail = [
 exports.AddBloodBank = [
 
 	(req, res) => {
-    console.log('this is recieve',req.body)
+ 
     try{
         Blood.findOne({name:req.body.name , address:req.body.address}).then(bank=>{
                 if(bank){
@@ -97,7 +97,7 @@ exports.AddBloodBank = [
 //Update Blood Bank 
 exports.UpdateBloodBank = [
 	(req, res) => {
-    console.log('this is recieve',req.body)
+   
     try{
 
         Blood.findOneAndUpdate(
@@ -150,7 +150,7 @@ exports.UpdateBloodBank = [
 exports.DeleteBloodBank = [
 
 	(req, res) => {
-    console.log('this is recieve',req.body)
+  
     try{
 		
         Blood.deleteOne(
@@ -173,7 +173,7 @@ exports.DeleteBloodBank = [
 exports.BloodBankBranches = [
 	
 	async (req, res) => {
-    console.log('this is recieve',req.body)
+   
     try{
         Blood.find({name:req.params.name}).then(bb=>{
             if(bb.length){
@@ -205,7 +205,7 @@ async function compare(a,b){
 //function to login to a blood bank
 exports.LoginBloodBank=[
     async (req,res)=>{
-        console.log('this is recieved ',req.body)
+        
         try{
             Blood.find({name:req.body.name,address:req.body.branch}).then(blood=>{
                 if(blood.length){
@@ -233,14 +233,14 @@ exports.LoginBloodBank=[
 exports.AllBloodGroups=[
 	
 	async (req, res) => {
-    console.log('this is recieve',req.params)
+ 
     try{
         await Blood.findOne({name:req.params.org_name , address:req.params.org_address}).then(bank=>{
           
                 if(bank){
                         
                     var bloodgroups=bank.BloodGroup
-                  console.log('bank is',bloodgroups)
+                 
                     return res.status(200).send({ bloodgroups:bloodgroups});
                 }
                 else{
@@ -259,7 +259,7 @@ exports.AllBloodGroups=[
 //function to update blood group
 exports.updateBloodGroup = [
   async (req, res) => {
-    console.log('this is received', req.body);
+    
 
     try {
         const { name, address, blood_list } = req.body;
@@ -295,7 +295,7 @@ exports.updateBloodGroup = [
 //function to delete selected blood groups
 exports.deleteSelectedBlood = [
   async (req, res) => {
-    console.log('this is received', req.params);
+   
 
     try {
       const { name, address, fields } = req.params;
@@ -329,7 +329,7 @@ exports.deleteSelectedBlood = [
 exports.AddBloodGroup=[
 
   async (req, res) => {
-    console.log('this is receive', req.body);
+  
 
     try {
       const blood = await Blood.findOne({
@@ -460,14 +460,4 @@ exports.BloodBankStats = [
     }
 ];
 
-exports.BloodBankChart=[
-    (req, res) => {
-     
-        try {
-        }
-        catch(err){
-            console.log(err)
-            return res.status(430).json({ error: err });
-        }
-    }
-]
+

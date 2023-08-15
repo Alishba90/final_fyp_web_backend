@@ -10,6 +10,6 @@ router.get('/gettransactions/:org_name/:org_address',TransactionController.allTr
 router.get('/getlasttransact/:org_name/:org_address',TransactionController.LastTransaction)
 router.post("/transactionblood", TransactionController.addTransactionBlood);
 router.post("/transactionmeds", TransactionController.addTransactionMeds);
-
+router.post("/updateorder", OrderController.updateOrder);
 module.exports = router;
 

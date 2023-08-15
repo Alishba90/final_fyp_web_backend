@@ -37,7 +37,7 @@ exports.LastTransaction = [
 
       if (trans) {
         var transaction = trans;
-        console.log('last trans',transaction)
+        
         return res.status(200).send({ transaction: transaction });
       } else {
         return res.status(430).send({ null_data: "No transactions found" });
